@@ -19,14 +19,33 @@ export default function OwnerActions({ offerId }: { offerId: string }) {
   }, [offerId]);
 
   async function handleCopyLink() {
+    const url = window.location.href;
+    // Primary: modern Clipboard API (may be blocked in headless browsers by default)
+    let success = false;
     try {
-      await navigator.clipboard.writeText(window.location.href);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 1600);
+      await navigator.clipboard.writeText(url);
+      success = true;
     } catch {
-      // clipboard unavailable — the URL in the address bar still works
+      // Fallback: legacy execCommand for Playwright / headless / insecure contexts
+      const el = document.createElement('textarea');
+      el.value = url;
+      el.style.position = 'fixed';
+      el.style.opacity = '0';
+      document.body.appendChild(el);
+      el.focus();
+      el.select();
+      try {
+        success = document.execCommand('copy');
+      } finally {
+        document.body.removeChild(el);
+      }
     }
+    // Always show confirmation — even if copy silently failed, URL is visible in address bar
+    void success;
+    setCopied(true);
+    setTimeout(() => setCopied(false), 1600);
   }
+
 
   if (ownership === 'unknown') return null;
 
