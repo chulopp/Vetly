@@ -11,7 +11,7 @@ Vetly takes a freelance project offer — pasted straight from the client's mess
 
 Every offer can be saved (no account needed — ownership lives in your browser), compared side by side, and shared as a link.
 
-> **Live URL:** _add the Vercel deployment URL here after the first deploy_
+> **Live URL:** [https://vetly-cut.vercel.app](https://vetly-cut.vercel.app) · **Automated PR Testing:** Powered by [TestSprite](https://testsprite.com) (Season 4)
 
 Built for **TestSprite Season 4**. The analysis engine is intentionally **deterministic and self-contained** — no flaky third-party dependency sits in the decision path — so generated test suites can assert deep, meaningful behavior.
 

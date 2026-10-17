@@ -34,3 +34,7 @@ IMPLEMENTATION_PLAN.md
 # agent instructions & customizations
 .agents/
 
+# test reports
+*.pdf
+
+
