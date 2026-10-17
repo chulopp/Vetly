@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { Check, ListPlus, PenLine, Plus, Share2 } from 'lucide-react';
 import { addMyOffer, ownsOffer } from '@/lib/myOffers';
@@ -13,9 +13,13 @@ import { addMyOffer, ownsOffer } from '@/lib/myOffers';
 export default function OwnerActions({ offerId }: { offerId: string }) {
   const [ownership, setOwnership] = useState<'owner' | 'visitor' | 'unknown'>('unknown');
   const [copied, setCopied] = useState(false);
+  const copyTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     setOwnership(ownsOffer(offerId) ? 'owner' : 'visitor');
+    return () => {
+      if (copyTimeoutRef.current) clearTimeout(copyTimeoutRef.current);
+    };
   }, [offerId]);
 
   async function handleCopyLink() {
@@ -42,8 +46,9 @@ export default function OwnerActions({ offerId }: { offerId: string }) {
     }
     // Always show confirmation — even if copy silently failed, URL is visible in address bar
     void success;
+    if (copyTimeoutRef.current) clearTimeout(copyTimeoutRef.current);
     setCopied(true);
-    setTimeout(() => setCopied(false), 1600);
+    copyTimeoutRef.current = setTimeout(() => setCopied(false), 2500);
   }
 
 
@@ -76,7 +81,9 @@ export default function OwnerActions({ offerId }: { offerId: string }) {
           className="flex items-center justify-center gap-1.5 rounded-xl border border-white/15 bg-white/[0.03] px-3 py-2.5 text-xs font-medium text-ink-300 transition hover:border-white/30 hover:text-ink-100"
         >
           {copied ? <Check className="size-3.5 text-accept" /> : <Share2 className="size-3.5" />}
-          {copied ? 'Link copied' : 'Copy share link'}
+          <span role="status" aria-live="polite">
+            {copied ? 'Link copied' : 'Copy share link'}
+          </span>
         </button>
         <Link
           href={`/?prefill=${offerId}`}
