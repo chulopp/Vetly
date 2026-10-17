@@ -52,8 +52,13 @@ export default function EntryCard() {
   const [submitError, setSubmitError] = useState<string | null>(null);
 
   // ── Duplicate & edit: /?prefill=<id> populates the form (PRD §4.2 Step 4) ──
+  // ── Intake parameter: /?intake=open expands the form (from compare empty-state CTA) ──
   useEffect(() => {
-    const prefillId = new URLSearchParams(window.location.search).get('prefill');
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('intake') === 'open') {
+      setFormOpen(true);
+    }
+    const prefillId = params.get('prefill');
     if (!prefillId) return;
     let cancelled = false;
     fetch(`/api/offers/${encodeURIComponent(prefillId)}`)

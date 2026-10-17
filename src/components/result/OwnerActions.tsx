@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { Check, ListPlus, PenLine, Plus, Share2 } from 'lucide-react';
-import { ownsOffer } from '@/lib/myOffers';
+import { addMyOffer, ownsOffer } from '@/lib/myOffers';
 
 /**
  * Owner toolbar (PRD §4.2 Step 4): shown only when this id is in the viewer's
@@ -87,6 +87,7 @@ export default function OwnerActions({ offerId }: { offerId: string }) {
         </Link>
         <Link
           href="/compare"
+          onClick={() => addMyOffer(offerId)}
           className="flex items-center justify-center gap-1.5 rounded-xl border border-white/15 bg-white/[0.03] px-3 py-2.5 text-xs font-medium text-ink-300 transition hover:border-white/30 hover:text-ink-100"
         >
           <ListPlus className="size-3.5" />
