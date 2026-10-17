@@ -67,8 +67,9 @@ Every failure found during test iterations, and how it was fixed:
 | 6 | Typecheck: `Property 'targetRate' does not exist on type 'ExtractedFields'` | The extraction schema deliberately excludes the user's own target rate (never extractable from a client message); prefill code still referenced it | Removed the dead prefill branch | Green |
 | 7 | API smoke test: Smart Paste with whitespace-only text returned `200 ok:false` instead of `400` | `min(1)` passed on `"   "` because length counts spaces | Added `.trim()` before `.min(1)` in the extract request schema | `400` with field-specific message — green |
 | 8 | One run showed a single Intl formatting assertion failing; never reproduced in 12+ subsequent runs | Suspected a transient ICU hiccup under parallel test workers | Memoized `Intl.NumberFormat` per currency (same args → same cached formatter) as defense in depth | 12+ consecutive green runs |
+| 9 | TestSprite (PR #2): `Copy a share link from an owned result` failed. Button clicked but no visible confirmation appeared in DOM | Headless browser blocks `navigator.clipboard.writeText` by default, aborting execution before `setCopied(true)` | Implemented `document.execCommand('copy')` fallback in `OwnerActions.tsx` and ensured state transition fires. Branch: `fix/clipboard-share-confirmation`, commit: `303698f`, PR: #2 | Test passed on rerun. Suite pass count increased from 27 to 30. Check status SUCCESS (2026-10-17) |
 
-TestSprite rows will be appended below as its suite iterates against the live deployment.
+TestSprite automated test loop iterations are appended to this table following every merged PR.
 
 ## Privacy note
 
