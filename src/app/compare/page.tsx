@@ -32,14 +32,18 @@ export default async function ComparePage({
   const rawCookie = cookieStore.get(COOKIE_NAME)?.value;
   const cookieIds = parseMyCookie(rawCookie);
 
-  const ids = [...new Set([...queryIds, ...cookieIds])].slice(-50);
+  const isFixture = search.fixture === 'true' || search.demo === 'true' || search.sample === 'true';
+  const effectiveIds =
+    isFixture && queryIds.length === 0 && cookieIds.length === 0
+      ? ['ideal-saas-mvp', 'scope-creep-trap', 'corporate-net90']
+      : [...new Set([...queryIds, ...cookieIds])].slice(-50);
 
   let offers: OfferRecord[] = [];
   let loadError = false;
 
-  if (ids.length > 0) {
+  if (effectiveIds.length > 0) {
     try {
-      offers = await listOffers(ids);
+      offers = await listOffers(effectiveIds);
     } catch (error) {
       if (!(error instanceof DatabaseNotConfiguredError)) {
         console.error('[compare page] failed to load offers:', error);

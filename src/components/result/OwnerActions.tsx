@@ -125,15 +125,6 @@ export default function OwnerActions({ offerId, isOwner }: OwnerActionsProps) {
           New analysis
         </Link>
       </div>
-      <div className="mt-3 text-center">
-        <Link
-          href={`/share/${offerId}`}
-          className="text-xs text-ink-400 transition hover:text-ink-200"
-          title="Preview the read-only shared view"
-        >
-          Preview shared view ↗
-        </Link>
-      </div>
     </div>
   );
 }

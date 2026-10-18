@@ -60,6 +60,8 @@ export default function OfferForm({ form, errors, onFieldChange, onFieldBlur, on
         <div className="relative mt-1.5">
           <select
             id="field-currency"
+            name="currency"
+            data-testid="input-currency"
             required
             aria-required="true"
             value={form.currency}
@@ -100,6 +102,8 @@ export default function OfferForm({ form, errors, onFieldChange, onFieldBlur, on
               <button
                 key={option.flag}
                 type="button"
+                name={option.flag}
+                data-testid={`flag-${option.flag}`}
                 aria-pressed={active}
                 title={option.hint}
                 onClick={() => onFlagToggle(option.flag)}
@@ -146,6 +150,8 @@ function NumericField({
       </label>
       <input
         id={`field-${field.key}`}
+        name={field.key}
+        data-testid={`input-${field.key}`}
         type="text"
         inputMode="decimal"
         autoComplete="off"

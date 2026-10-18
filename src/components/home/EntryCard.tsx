@@ -42,6 +42,7 @@ export default function EntryCard() {
 
   const [form, setForm] = useState<FormState>(EMPTY_FORM);
   const [activePresetId, setActivePresetId] = useState<string | null>(null);
+  const [presetRevision, setPresetRevision] = useState(0);
   const [touched, setTouched] = useState<Partial<Record<FormFieldKey, boolean>>>({});
   const [serverFieldErrors, setServerFieldErrors] = useState<Partial<Record<FormFieldKey, string>>>({});
   const [formOpen, setFormOpen] = useState(false);
@@ -156,6 +157,7 @@ export default function EntryCard() {
 
   function applyPreset(input: OfferInput, presetId?: string) {
     setActivePresetId(presetId ?? null);
+    setPresetRevision((r) => r + 1);
     setForm(inputToForm(input));
     setTouched({});
     setServerFieldErrors({});
@@ -348,6 +350,7 @@ export default function EntryCard() {
               className="grid grid-cols-1 gap-4 sm:grid-cols-2"
             >
               <OfferForm
+                key={`${activePresetId ?? 'manual'}-${presetRevision}`}
                 form={form}
                 errors={errors}
                 onFieldChange={handleFieldChange}

@@ -110,6 +110,12 @@ export function CompareTable({ initialOffers = [] }: { initialOffers?: OfferReco
           <Plus className="size-4" />
           Analyze your first offer
         </Link>
+        <Link
+          href="/compare?sample=true"
+          className="mt-3 text-xs text-ink-400 transition hover:text-ink-200"
+        >
+          View sample comparison table ↗
+        </Link>
       </div>
     );
   }
