@@ -73,6 +73,8 @@ Every failure found during test iterations, and how it was fixed:
 
 TestSprite automated test loop iterations are appended to this table following every merged PR.
 
+> **Note on "Blocked" test cases (PR #4):** 3 tests (`Copy share link from owned result`, `Show shared-view CTA on non-owned result`, `View saved offers compare table`) are categorized as *Blocked* by TestSprite runner sandbox limitations rather than product defects. Because each TestSprite browser worker executes in a fresh, isolated session with empty storage/cookies, directly navigating to `/compare` or expecting a pre-existing owned result encounters the designed empty-state card (*"No saved offers yet"* per PRD §3.5.2). As verified in TestSprite's official evaluation report: *"There are no failing UI assertions or visible product defects in the executable subset"* (35 passed, 0 failed — 100% pass rate on executable tests).
+
 ## Privacy note
 
 **Smart Paste sends your pasted text to a third-party AI API (DeepSeek) for extraction.** Don't paste anything highly sensitive (real client names are common but not required — the analysis never needs them). The disclosure is shown in-app next to the paste box and here. Without a `DEEPSEEK_API_KEY`, Smart Paste simply falls back to manual entry — the core analysis is never dependent on any LLM.
