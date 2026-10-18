@@ -24,11 +24,11 @@ function inputClass(hasError: boolean): string {
 const NUMERIC_FIELDS: Array<{ key: FormFieldKey; label: string; placeholder: string; hint: string }> = [
   { key: 'budget', label: 'Project budget / quote', placeholder: 'e.g. 8000', hint: 'The total the client offered, in the selected currency.' },
   { key: 'estimatedHours', label: 'Estimated hours', placeholder: 'e.g. 120', hint: 'Your realistic estimate of the work.' },
+  { key: 'targetRate', label: 'Your target hourly rate', placeholder: 'e.g. 50', hint: 'What you need to earn per hour.' },
   { key: 'platformFeePercent', label: 'Platform fee %', placeholder: '0', hint: '0 direct · 3 Wise/Stripe · 10 Upwork · 20 Fiverr · empty = 0.' },
   { key: 'depositPercent', label: 'Upfront deposit %', placeholder: 'e.g. 50', hint: '0–100 · empty = 0 (no deposit).' },
   { key: 'paymentTermsDays', label: 'Payment terms (days)', placeholder: 'e.g. 7, 30, 90', hint: 'Days until you get paid · empty = 0 (due upfront).' },
   { key: 'allowedRevisions', label: 'Allowed revisions', placeholder: 'e.g. 2', hint: 'Whole rounds · 0–2 cost no extra hours.' },
-  { key: 'targetRate', label: 'Your target hourly rate', placeholder: 'e.g. 50', hint: 'What you need to earn per hour.' },
 ];
 
 const FLAG_OPTIONS: Array<{ flag: OfferFlag; label: string; hint: string }> = [
@@ -60,6 +60,8 @@ export default function OfferForm({ form, errors, onFieldChange, onFieldBlur, on
         <div className="relative mt-1.5">
           <select
             id="field-currency"
+            name="currency"
+            data-testid="input-currency"
             required
             aria-required="true"
             value={form.currency}
@@ -100,6 +102,8 @@ export default function OfferForm({ form, errors, onFieldChange, onFieldBlur, on
               <button
                 key={option.flag}
                 type="button"
+                name={option.flag}
+                data-testid={`flag-${option.flag}`}
                 aria-pressed={active}
                 title={option.hint}
                 onClick={() => onFlagToggle(option.flag)}
@@ -146,6 +150,8 @@ function NumericField({
       </label>
       <input
         id={`field-${field.key}`}
+        name={field.key}
+        data-testid={`input-${field.key}`}
         type="text"
         inputMode="decimal"
         autoComplete="off"

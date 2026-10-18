@@ -2,6 +2,8 @@ import { desc, eq, inArray } from 'drizzle-orm';
 import { nanoid } from 'nanoid';
 import { getDb } from '@/lib/db/client';
 import { offers } from '@/lib/db/schema';
+import { analyzeOffer } from '@/lib/engine';
+import { findPreset } from '@/lib/presets';
 import type { AnalysisResult, OfferInput } from '@/lib/engine/types';
 
 export interface OfferRecord {
@@ -64,14 +66,80 @@ function toRecord(row: OfferRow): OfferRecord {
 }
 
 export async function getOffer(id: string): Promise<OfferRecord | null> {
-  const db = getDb();
-  const rows = await db.select().from(offers).where(eq(offers.id, id)).limit(1);
-  return rows.length > 0 ? toRecord(rows[0]) : null;
+  try {
+    const db = getDb();
+    const rows = await db.select().from(offers).where(eq(offers.id, id)).limit(1);
+    if (rows.length > 0) return toRecord(rows[0]);
+  } catch (error) {
+    const preset = findPreset(id);
+    if (preset) {
+      return {
+        id: preset.id,
+        input: preset.input,
+        analysis: analyzeOffer(preset.input),
+        createdAt: new Date().toISOString(),
+      };
+    }
+    throw error;
+  }
+
+  // If not in database, check if id is a preset or preset alias
+  const preset = findPreset(id);
+  if (preset) {
+    return {
+      id: preset.id,
+      input: preset.input,
+      analysis: analyzeOffer(preset.input),
+      createdAt: new Date().toISOString(),
+    };
+  }
+  return null;
 }
 
 export async function listOffers(ids: string[]): Promise<OfferRecord[]> {
   if (ids.length === 0) return [];
-  const db = getDb();
-  const rows = await db.select().from(offers).where(inArray(offers.id, ids)).orderBy(desc(offers.createdAt));
-  return rows.map(toRecord);
+  const records: OfferRecord[] = [];
+
+  try {
+    const db = getDb();
+    const rows = await db.select().from(offers).where(inArray(offers.id, ids)).orderBy(desc(offers.createdAt));
+    records.push(...rows.map(toRecord));
+  } catch (error) {
+    const foundIds = new Set<string>();
+    for (const requestedId of ids) {
+      if (!foundIds.has(requestedId)) {
+        const preset = findPreset(requestedId);
+        if (preset && !foundIds.has(preset.id)) {
+          foundIds.add(preset.id);
+          records.push({
+            id: preset.id,
+            input: preset.input,
+            analysis: analyzeOffer(preset.input),
+            createdAt: new Date().toISOString(),
+          });
+        }
+      }
+    }
+    if (records.length > 0) return records;
+    throw error;
+  }
+
+  // Also include any preset IDs in the requested list that aren't in the database
+  const foundIds = new Set(records.map((r) => r.id));
+  for (const requestedId of ids) {
+    if (!foundIds.has(requestedId)) {
+      const preset = findPreset(requestedId);
+      if (preset && !foundIds.has(preset.id)) {
+        foundIds.add(preset.id);
+        records.push({
+          id: preset.id,
+          input: preset.input,
+          analysis: analyzeOffer(preset.input),
+          createdAt: new Date().toISOString(),
+        });
+      }
+    }
+  }
+
+  return records;
 }

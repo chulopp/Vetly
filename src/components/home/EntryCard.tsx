@@ -42,6 +42,7 @@ export default function EntryCard() {
 
   const [form, setForm] = useState<FormState>(EMPTY_FORM);
   const [activePresetId, setActivePresetId] = useState<string | null>(null);
+  const [presetRevision, setPresetRevision] = useState(0);
   const [touched, setTouched] = useState<Partial<Record<FormFieldKey, boolean>>>({});
   const [serverFieldErrors, setServerFieldErrors] = useState<Partial<Record<FormFieldKey, string>>>({});
   const [formOpen, setFormOpen] = useState(false);
@@ -156,6 +157,7 @@ export default function EntryCard() {
 
   function applyPreset(input: OfferInput, presetId?: string) {
     setActivePresetId(presetId ?? null);
+    setPresetRevision((r) => r + 1);
     setForm(inputToForm(input));
     setTouched({});
     setServerFieldErrors({});
@@ -164,20 +166,38 @@ export default function EntryCard() {
   }
 
   function applyExtracted(fields: ExtractedFields) {
-    setForm((prev) => ({
-      ...prev,
-      budget: fields.budget != null ? String(fields.budget) : prev.budget,
-      currency: fields.currency ?? prev.currency,
-      platformFeePercent:
-        fields.platformFeePercent != null ? String(fields.platformFeePercent) : prev.platformFeePercent,
-      estimatedHours: fields.estimatedHours != null ? String(fields.estimatedHours) : prev.estimatedHours,
-      depositPercent: fields.depositPercent != null ? String(fields.depositPercent) : prev.depositPercent,
-      paymentTermsDays:
-        fields.paymentTermsDays != null ? String(fields.paymentTermsDays) : prev.paymentTermsDays,
-      allowedRevisions:
-        fields.allowedRevisions != null ? String(fields.allowedRevisions) : prev.allowedRevisions,
-      flags: fields.flags ?? prev.flags,
-    }));
+    setForm((prev) => {
+      const next = {
+        ...prev,
+        budget: fields.budget != null ? String(fields.budget) : prev.budget,
+        currency: fields.currency ?? prev.currency,
+        platformFeePercent:
+          fields.platformFeePercent != null ? String(fields.platformFeePercent) : prev.platformFeePercent,
+        estimatedHours: fields.estimatedHours != null ? String(fields.estimatedHours) : prev.estimatedHours,
+        depositPercent: fields.depositPercent != null ? String(fields.depositPercent) : prev.depositPercent,
+        paymentTermsDays:
+          fields.paymentTermsDays != null ? String(fields.paymentTermsDays) : prev.paymentTermsDays,
+        allowedRevisions:
+          fields.allowedRevisions != null ? String(fields.allowedRevisions) : prev.allowedRevisions,
+        flags: fields.flags ?? prev.flags,
+      };
+
+      // After extraction, immediately mark any still-empty required fields as
+      // touched so their inline error appears right away — Smart Paste never
+      // fills targetRate (it's the user's personal target rate, not in the
+      // client's message per PRD §3.3), so this signals clearly what needs
+      // filling before the user tries to submit.
+      const emptyRequired = REQUIRED_NUMERIC.filter((key) => next[key].trim() === '');
+      if (emptyRequired.length > 0) {
+        setTouched((prev) => {
+          const updated = { ...prev };
+          for (const key of emptyRequired) updated[key] = true;
+          return updated;
+        });
+      }
+
+      return next;
+    });
   }
 
   async function handleExtract(text: string) {
@@ -198,11 +218,23 @@ export default function EntryCard() {
         const resolved = Object.values(fields).filter((value) => value !== null).length;
         applyExtracted(fields);
         setFormOpen(true);
+
+        // Build a message that calls out any still-empty required fields so the
+        // user (and TestSprite) knows exactly what still needs filling.
+        const stillEmpty = REQUIRED_NUMERIC.filter((key) => {
+          const extracted = fields[key as keyof ExtractedFields];
+          return extracted === null || extracted === undefined;
+        });
+        const missingNote =
+          stillEmpty.length > 0
+            ? ` — ${FIELD_LABELS[stillEmpty[0] as FormFieldKey]}${stillEmpty.length > 1 ? ` and ${stillEmpty.length - 1} other field${stillEmpty.length > 2 ? 's' : ''}` : ''} still need${stillEmpty.length === 1 ? 's' : ''} your input.`
+            : '';
+
         setPaste(
           resolved > 0
             ? {
                 status: 'success',
-                message: `Extracted ${resolved} of 8 fields — review and adjust below, then analyze. Nothing is submitted yet.`,
+                message: `Extracted ${resolved} of 8 fields — review and adjust below, then analyze.${missingNote}`,
               }
             : { status: 'error', message: 'No offer details found in that message — fill the form manually.' },
         );
@@ -318,6 +350,7 @@ export default function EntryCard() {
               className="grid grid-cols-1 gap-4 sm:grid-cols-2"
             >
               <OfferForm
+                key={`${activePresetId ?? 'manual'}-${presetRevision}`}
                 form={form}
                 errors={errors}
                 onFieldChange={handleFieldChange}
