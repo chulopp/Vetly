@@ -50,7 +50,7 @@ Counter-offer semantics: budget-side numbers (suggested budget, max executable h
 
 ## What the test suite covers
 
-- **`tests/` (Vitest, in-repo)** — the full PRD §3.4 boundary matrix: tier boundaries at exactly 30/31 and 60/61, margin bands at 0% and +20%, platform fee `< 100` (100 exactly → reject), non-integer revisions, the +35% unlimited-revision lockout, the 100-point risk cap, currency validation + rounding (2dp USD, 0dp JPY/IDR), all 9 decision-matrix cells, counter-offer formulas, contract-condition strings, and every validation rejection mapped to its exact field-specific message. 96 tests, all green.
+- **`tests/` (Vitest, in-repo)** — the full PRD §3.4 boundary matrix: tier boundaries at exactly 30/31 and 60/61, margin bands at 0% and +20%, platform fee `< 100` (100 exactly → reject), non-integer revisions, the +35% unlimited-revision lockout, the 100-point risk cap, currency validation + rounding (2dp USD, 0dp JPY/IDR), all 9 decision-matrix cells, counter-offer formulas, contract-condition strings, and every validation rejection mapped to its exact field-specific message. 106 tests, all green.
 - **TestSprite suite (generated against the live deployment)** — end-to-end API behavior: valid create → 201 with id + analysis, every §3.4 violation → field-specific 400, unknown id → 404, Smart Paste's schema-stable `{ ok, fields, error }` response (every field present or null), and the deterministic numbers across presets.
 
 ### Fail → fix → green
@@ -145,6 +145,6 @@ src/
     ├── currency/           # bundled ISO 4217 list + Intl formatting
     ├── db/ · offers/       # Drizzle schema + persistence (server-only)
     └── llm/                # DeepSeek client + Smart Paste + drafting (server-only, isolated)
-tests/                      # Vitest boundary suite (96 tests)
+tests/                      # Vitest boundary suite (106 tests)
 drizzle/                    # generated SQL migrations
 ```
