@@ -69,7 +69,19 @@ export function findPreset(id: string): PresetDefinition | undefined {
       (norm === 'preset-1' && p.id === 'ideal-saas-mvp') ||
       (norm === 'preset-2' && p.id === 'scope-creep-trap') ||
       (norm === 'preset-3' && p.id === 'corporate-net90') ||
+      (norm === '1' && p.id === 'ideal-saas-mvp') ||
+      (norm === '2' && p.id === 'scope-creep-trap') ||
+      (norm === '3' && p.id === 'corporate-net90') ||
       (norm === 'sample' && p.id === 'ideal-saas-mvp') ||
-      (norm === 'demo' && p.id === 'ideal-saas-mvp'),
+      (norm === 'demo' && p.id === 'ideal-saas-mvp') ||
+      (norm === 'test' && p.id === 'ideal-saas-mvp') ||
+      (norm === 'shared' && p.id === 'ideal-saas-mvp') ||
+      (norm === 'share' && p.id === 'ideal-saas-mvp') ||
+      (norm === 'preview' && p.id === 'ideal-saas-mvp') ||
+      (norm === 'example' && p.id === 'ideal-saas-mvp') ||
+      (norm === 'offer-1' && p.id === 'ideal-saas-mvp') ||
+      (norm === 'offer-2' && p.id === 'scope-creep-trap') ||
+      (norm === 'offer-3' && p.id === 'corporate-net90') ||
+      (norm === 'default' && p.id === 'ideal-saas-mvp'),
   );
 }
