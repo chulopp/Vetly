@@ -4,12 +4,8 @@ const nextConfig: NextConfig = {
   async rewrites() {
     return [
       {
-        source: '/share/:id',
-        destination: '/result/:id',
-      },
-      {
         source: '/shared/:id',
-        destination: '/result/:id',
+        destination: '/share/:id',
       },
     ];
   },

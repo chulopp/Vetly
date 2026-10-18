@@ -10,12 +10,21 @@ import { addMyOffer, ownsOffer } from '@/lib/myOffers';
  * localStorage myOffers. Non-owners (shared links) see a read-only view with
  * an "Analyze your own deal" CTA instead.
  */
-export default function OwnerActions({ offerId }: { offerId: string }) {
+interface OwnerActionsProps {
+  offerId: string;
+  forceVisitor?: boolean;
+}
+
+export default function OwnerActions({ offerId, forceVisitor = false }: OwnerActionsProps) {
   const [ownership, setOwnership] = useState<'owner' | 'visitor' | 'unknown'>('unknown');
   const [copied, setCopied] = useState(false);
   const copyTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
+    if (forceVisitor) {
+      setOwnership('visitor');
+      return;
+    }
     const pathname = typeof window !== 'undefined' ? window.location.pathname : '';
     const search = typeof window !== 'undefined' ? window.location.search : '';
     const isShareRoute =
@@ -23,7 +32,8 @@ export default function OwnerActions({ offerId }: { offerId: string }) {
       pathname.startsWith('/shared') ||
       search.includes('share') ||
       search.includes('public') ||
-      search.includes('visitor');
+      search.includes('visitor') ||
+      search.includes('readonly');
 
     if (isShareRoute) {
       setOwnership('visitor');
@@ -33,7 +43,7 @@ export default function OwnerActions({ offerId }: { offerId: string }) {
     return () => {
       if (copyTimeoutRef.current) clearTimeout(copyTimeoutRef.current);
     };
-  }, [offerId]);
+  }, [offerId, forceVisitor]);
 
   async function handleCopyLink() {
     const url = `${window.location.origin}/share/${offerId}`;

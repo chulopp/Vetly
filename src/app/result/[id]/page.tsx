@@ -8,7 +8,9 @@ import DraftMessage from '@/components/result/DraftMessage';
 import OwnerActions from '@/components/result/OwnerActions';
 import RateComparison from '@/components/result/RateComparison';
 import RiskBreakdown from '@/components/result/RiskBreakdown';
+import { PRESETS } from '@/components/home/PresetChips';
 import { DatabaseNotConfiguredError } from '@/lib/db/client';
+import { analyzeOffer } from '@/lib/engine';
 import { getOffer, type OfferRecord } from '@/lib/offers/service';
 import { OFFER_ID_PATTERN } from '@/lib/validation/offer';
 
@@ -25,26 +27,62 @@ async function loadOffer(id: string): Promise<{ offer: OfferRecord | null; dbErr
 
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
   const { id } = await params;
-  if (!OFFER_ID_PATTERN.test(id)) return { title: 'Offer not found — Vetly' };
-  const { offer } = await loadOffer(id);
-  if (!offer) return { title: 'Offer not found — Vetly' };
+  if (!OFFER_ID_PATTERN.test(id)) return { title: 'Offer not found - Vetly' };
+  let { offer } = await loadOffer(id);
+  if (!offer) {
+    const preset = PRESETS.find((p) => p.id === id);
+    if (preset) {
+      offer = {
+        id: preset.id,
+        createdAt: new Date().toISOString(),
+        input: preset.input,
+        analysis: analyzeOffer(preset.input),
+      };
+    }
+  }
+  if (!offer) return { title: 'Offer not found - Vetly' };
   return {
-    title: `${offer.analysis.recommendAction} — Vetly offer analysis`,
+    title: `${offer.analysis.recommendAction} - Vetly offer analysis`,
     description: offer.analysis.decisionReason,
   };
 }
 
 /**
- * Result page (PRD §4.3): two columns on desktop — the narrative ("why") on
- * the left, the action ("now what") sticky on the right — stacking to one
+ * Result page (PRD §4.3): two columns on desktop - the narrative ("why") on
+ * the left, the action ("now what") sticky on the right - stacking to one
  * column in the same priority order on mobile. Doubles as the public shared
  * view: ownership (localStorage) only toggles the owner toolbar.
  */
-export default async function ResultPage({ params }: { params: Promise<{ id: string }> }) {
+export default async function ResultPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ id: string }>;
+  searchParams?: Promise<{ [key: string]: string | string[] | undefined }>;
+}) {
   const { id } = await params;
+  const search = searchParams ? await searchParams : {};
+  const isForcedShared =
+    search.shared !== undefined ||
+    search.view === 'shared' ||
+    search.readonly !== undefined ||
+    search.public !== undefined;
+
   if (!OFFER_ID_PATTERN.test(id)) notFound();
 
-  const { offer, dbError } = await loadOffer(id);
+  let { offer, dbError } = await loadOffer(id);
+  if (!offer && !dbError) {
+    const preset = PRESETS.find((p) => p.id === id);
+    if (preset) {
+      offer = {
+        id: preset.id,
+        createdAt: new Date().toISOString(),
+        input: preset.input,
+        analysis: analyzeOffer(preset.input),
+      };
+    }
+  }
+
   if (dbError) return <DbUnavailableCard />;
   if (!offer) notFound();
 
@@ -53,14 +91,14 @@ export default async function ResultPage({ params }: { params: Promise<{ id: str
   return (
     <main className="mx-auto w-full max-w-5xl px-4 pb-16 pt-24">
       <div className="grid gap-6 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">
-        {/* left column — the narrative: why this verdict */}
+        {/* left column - the narrative: why this verdict */}
         <div className="flex min-w-0 flex-col gap-6">
           <DecisionBadge action={analysis.recommendAction} reason={analysis.decisionReason} />
           <RateComparison offer={offer} />
           <RiskBreakdown analysis={analysis} />
         </div>
 
-        {/* right column — the action: what to do about it */}
+        {/* right column - the action: what to do about it */}
         <div className="flex min-w-0 flex-col gap-6 lg:sticky lg:top-24 lg:self-start">
           {analysis.counterOffer?.budgetTriggered && (
             <CounterOfferCard counterOffer={analysis.counterOffer} currency={offer.input.currency} />
@@ -69,7 +107,7 @@ export default async function ResultPage({ params }: { params: Promise<{ id: str
             <ContractConditions counterOffer={analysis.counterOffer} />
           )}
           {analysis.counterOffer && <DraftMessage offerId={offer.id} />}
-          <OwnerActions offerId={offer.id} />
+          <OwnerActions offerId={offer.id} forceVisitor={isForcedShared} />
         </div>
       </div>
     </main>
