@@ -44,22 +44,22 @@ export function CompareTable({ initialOffers = [] }: { initialOffers?: OfferReco
   const [sort, setSort] = useState<{ key: SortKey; dir: SortDir }>({ key: 'createdAt', dir: 'desc' });
 
   useEffect(() => {
-    if (initialOffers.length > 0) {
-      setOffers(initialOffers);
-      return;
-    }
-
-    // Client mirror fallback: if server saw no cookie, check localStorage
     const localIds = getMyOffers();
-    if (localIds.length > 0) {
+    if (localIds.length > initialOffers.length) {
       fetch(`/api/offers?ids=${encodeURIComponent(localIds.join(','))}`)
         .then((res) => (res.ok ? res.json() : null))
         .then((data) => {
-          if (data && Array.isArray(data.offers) && data.offers.length > 0) {
+          if (data && Array.isArray(data.offers) && data.offers.length > initialOffers.length) {
             setOffers(data.offers);
+          } else if (initialOffers.length > 0) {
+            setOffers(initialOffers);
           }
         })
-        .catch(() => {});
+        .catch(() => {
+          if (initialOffers.length > 0) setOffers(initialOffers);
+        });
+    } else if (initialOffers.length > 0) {
+      setOffers(initialOffers);
     }
   }, [initialOffers]);
 

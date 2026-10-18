@@ -28,11 +28,14 @@ export function parseMyCookie(raw: string | undefined): string[] {
     if (text.startsWith('"') && text.endsWith('"') && text.length >= 2) {
       text = text.slice(1, -1).trim();
     }
-    if (text.includes('%')) {
+    // Fully decode all percent encoding layers (e.g. double-encoded cookies)
+    while (text.includes('%')) {
       try {
-        text = decodeURIComponent(text);
+        const decoded = decodeURIComponent(text);
+        if (decoded === text) break;
+        text = decoded;
       } catch {
-        // ignore URI decode error and try JSON.parse directly
+        break;
       }
     }
     if (text.startsWith('"') && text.endsWith('"') && text.length >= 2) {

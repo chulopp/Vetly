@@ -55,10 +55,14 @@ export default function OwnerActions({ offerId, isOwner }: OwnerActionsProps) {
     typeof window !== 'undefined' &&
     (window.location.pathname.startsWith('/share') ||
       window.location.pathname.startsWith('/shared') ||
-      window.location.search.includes('shared') ||
+      window.location.search.includes('share') ||
       window.location.search.includes('public') ||
       window.location.search.includes('visitor') ||
-      window.location.search.includes('readonly'));
+      window.location.search.includes('guest') ||
+      window.location.search.includes('preview') ||
+      window.location.search.includes('readonly') ||
+      window.location.search.includes('read_only') ||
+      window.location.search.includes('read-only'));
 
   if (!isOwner || isClientShare) {
     return (

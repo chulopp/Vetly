@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { cookies } from 'next/headers';
 import { analyzeOffer } from '@/lib/engine';
 import { DatabaseNotConfiguredError } from '@/lib/db/client';
 import { createOffer, listOffers } from '@/lib/offers/service';
@@ -41,19 +42,21 @@ export async function POST(request: Request) {
 
     // Read the existing my_offers cookie from the request (if any), append
     // the new id, and write the updated cookie back in the response.
-    const existingCookie = request.headers.get('cookie') ?? undefined;
-    const existingRaw = existingCookie
-      ?.split(';')
-      .map((s) => s.trim())
-      .find((s) => s.startsWith(`${COOKIE_NAME}=`))
-      ?.slice(COOKIE_NAME.length + 1);
+    const cookieStore = await cookies();
+    const existingRaw =
+      cookieStore.get(COOKIE_NAME)?.value ??
+      (request.headers.get('cookie') ?? undefined)
+        ?.split(';')
+        .map((s) => s.trim())
+        .find((s) => s.startsWith(`${COOKIE_NAME}=`))
+        ?.slice(COOKIE_NAME.length + 1);
     const existingIds = parseMyCookie(existingRaw);
     const updatedIds = [...new Set([...existingIds, id])].slice(-50);
 
     const response = NextResponse.json({ id, analysis }, { status: 201 });
     response.cookies.set({
       name: COOKIE_NAME,
-      value: encodeURIComponent(JSON.stringify(updatedIds)),
+      value: JSON.stringify(updatedIds),
       path: '/',
       maxAge: 60 * 60 * 24 * 30, // 30 days
       sameSite: 'lax',

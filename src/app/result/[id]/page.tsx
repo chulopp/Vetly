@@ -60,9 +60,26 @@ export default async function ResultPage({
   const isForcedShared =
     forceShared ||
     search.shared !== undefined ||
-    search.view === 'shared' ||
+    search.share !== undefined ||
+    search.shared_view !== undefined ||
+    search['shared-view'] !== undefined ||
     search.readonly !== undefined ||
-    search.public !== undefined;
+    search.read_only !== undefined ||
+    search['read-only'] !== undefined ||
+    search.public !== undefined ||
+    search.visitor !== undefined ||
+    search.guest !== undefined ||
+    search.preview !== undefined ||
+    search.view === 'shared' ||
+    search.view === 'readonly' ||
+    search.view === 'read-only' ||
+    search.view === 'public' ||
+    search.view === 'visitor' ||
+    search.mode === 'shared' ||
+    search.mode === 'readonly' ||
+    search.mode === 'read-only' ||
+    search.mode === 'public' ||
+    search.mode === 'visitor';
 
   if (!OFFER_ID_PATTERN.test(id)) notFound();
 
