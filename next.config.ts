@@ -7,6 +7,10 @@ const nextConfig: NextConfig = {
         source: '/share/:id',
         destination: '/result/:id',
       },
+      {
+        source: '/shared/:id',
+        destination: '/result/:id',
+      },
     ];
   },
   async redirects() {
