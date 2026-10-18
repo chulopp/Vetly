@@ -41,6 +41,7 @@ export default function EntryCard() {
   const router = useRouter();
 
   const [form, setForm] = useState<FormState>(EMPTY_FORM);
+  const [activePresetId, setActivePresetId] = useState<string | null>(null);
   const [touched, setTouched] = useState<Partial<Record<FormFieldKey, boolean>>>({});
   const [serverFieldErrors, setServerFieldErrors] = useState<Partial<Record<FormFieldKey, string>>>({});
   const [formOpen, setFormOpen] = useState(false);
@@ -130,6 +131,7 @@ export default function EntryCard() {
   // ── Handlers ──
 
   function handleFieldChange(key: FormFieldKey, value: string) {
+    setActivePresetId(null);
     setForm((prev) => ({ ...prev, [key]: value }));
     setServerFieldErrors({});
     setSubmitError(null);
@@ -145,13 +147,15 @@ export default function EntryCard() {
   }
 
   function handleFlagToggle(flag: OfferFlag) {
+    setActivePresetId(null);
     setForm((prev) => ({
       ...prev,
       flags: prev.flags.includes(flag) ? prev.flags.filter((f) => f !== flag) : [...prev.flags, flag],
     }));
   }
 
-  function applyPreset(input: OfferInput) {
+  function applyPreset(input: OfferInput, presetId?: string) {
+    setActivePresetId(presetId ?? null);
     setForm(inputToForm(input));
     setTouched({});
     setServerFieldErrors({});
@@ -288,7 +292,7 @@ export default function EntryCard() {
       <div className="glass-strong rounded-3xl p-5 md:p-7">
         <SmartPasteBox status={paste.status} message={paste.message} onExtract={handleExtract} />
 
-        <PresetChips className="mt-5" onApply={applyPreset} />
+        <PresetChips className="mt-5" onApply={applyPreset} activeId={activePresetId} />
 
         <button
           type="button"

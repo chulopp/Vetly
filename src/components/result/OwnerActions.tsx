@@ -16,14 +16,27 @@ export default function OwnerActions({ offerId }: { offerId: string }) {
   const copyTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
-    setOwnership(ownsOffer(offerId) ? 'owner' : 'visitor');
+    const pathname = typeof window !== 'undefined' ? window.location.pathname : '';
+    const search = typeof window !== 'undefined' ? window.location.search : '';
+    const isShareRoute =
+      pathname.startsWith('/share') ||
+      pathname.startsWith('/shared') ||
+      search.includes('share') ||
+      search.includes('public') ||
+      search.includes('visitor');
+
+    if (isShareRoute) {
+      setOwnership('visitor');
+    } else {
+      setOwnership(ownsOffer(offerId) ? 'owner' : 'visitor');
+    }
     return () => {
       if (copyTimeoutRef.current) clearTimeout(copyTimeoutRef.current);
     };
   }, [offerId]);
 
   async function handleCopyLink() {
-    const url = window.location.href;
+    const url = `${window.location.origin}/share/${offerId}`;
     // Primary: modern Clipboard API (may be blocked in headless browsers by default)
     let success = false;
     try {
