@@ -1,49 +1,26 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import Link from 'next/link';
 import { Check, ListPlus, PenLine, Plus, Share2 } from 'lucide-react';
-import { addMyOffer, ownsOffer } from '@/lib/myOffers';
+import { addMyOffer } from '@/lib/myOffers';
 
 /**
- * Owner toolbar (PRD §4.2 Step 4): shown only when this id is in the viewer's
- * localStorage myOffers. Non-owners (shared links) see a read-only view with
- * an "Analyze your own deal" CTA instead.
+ * Owner toolbar (PRD v7 §4.2 Step 4): rendered based on server-determined
+ * ownership (the `isOwner` prop comes from the server reading the `my_offers`
+ * cookie — no client-side localStorage or pathname inspection needed here).
+ *
+ * Non-owners (shared links, different device/browser) see a read-only view
+ * with an "Analyze your own deal" CTA instead.
  */
 interface OwnerActionsProps {
   offerId: string;
-  forceVisitor?: boolean;
+  isOwner: boolean;
 }
 
-export default function OwnerActions({ offerId, forceVisitor = false }: OwnerActionsProps) {
-  const [ownership, setOwnership] = useState<'owner' | 'visitor' | 'unknown'>('unknown');
+export default function OwnerActions({ offerId, isOwner }: OwnerActionsProps) {
   const [copied, setCopied] = useState(false);
   const copyTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  useEffect(() => {
-    if (forceVisitor) {
-      setOwnership('visitor');
-      return;
-    }
-    const pathname = typeof window !== 'undefined' ? window.location.pathname : '';
-    const search = typeof window !== 'undefined' ? window.location.search : '';
-    const isShareRoute =
-      pathname.startsWith('/share') ||
-      pathname.startsWith('/shared') ||
-      search.includes('share') ||
-      search.includes('public') ||
-      search.includes('visitor') ||
-      search.includes('readonly');
-
-    if (isShareRoute) {
-      setOwnership('visitor');
-    } else {
-      setOwnership(ownsOffer(offerId) ? 'owner' : 'visitor');
-    }
-    return () => {
-      if (copyTimeoutRef.current) clearTimeout(copyTimeoutRef.current);
-    };
-  }, [offerId, forceVisitor]);
 
   async function handleCopyLink() {
     const url = `${window.location.origin}/share/${offerId}`;
@@ -74,10 +51,7 @@ export default function OwnerActions({ offerId, forceVisitor = false }: OwnerAct
     copyTimeoutRef.current = setTimeout(() => setCopied(false), 2500);
   }
 
-
-  if (ownership === 'unknown') return null;
-
-  if (ownership === 'visitor') {
+  if (!isOwner) {
     return (
       <div className="glass animate-fade-up rounded-2xl p-5 text-center">
         <p className="text-sm text-ink-300">This analysis was shared with you.</p>
@@ -113,7 +87,7 @@ export default function OwnerActions({ offerId, forceVisitor = false }: OwnerAct
           className="flex items-center justify-center gap-1.5 rounded-xl border border-white/15 bg-white/[0.03] px-3 py-2.5 text-xs font-medium text-ink-300 transition hover:border-white/30 hover:text-ink-100"
         >
           <PenLine className="size-3.5" />
-          Duplicate & edit
+          Duplicate &amp; edit
         </Link>
         <Link
           href="/compare"

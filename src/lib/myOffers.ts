@@ -1,9 +1,17 @@
 'use client';
 
 /**
- * Client-side "ownership" of saved offers (PRD §4.1): the offer data lives in
- * Neon, addressed by id; this browser's saved offers are just an array of ids
- * in localStorage. No accounts, no auth.
+ * Client-side localStorage mirror for the offers saved in this browser
+ * (PRD v7 §3.1).
+ *
+ * IMPORTANT: localStorage is a convenience cache only — it is NOT the
+ * authoritative ownership record. The server-set `my_offers` cookie is what
+ * /result/[id] and /compare trust server-side to decide ownership. This module
+ * exists purely so client-side UI can reflect ownership state instantly (e.g.
+ * while a navigation is in flight) without waiting for a server round-trip.
+ *
+ * The cookie is set/updated by POST /api/offers on every successful offer
+ * creation via src/lib/ownershipCookie.ts.
  */
 
 const STORAGE_KEY = 'myOffers';

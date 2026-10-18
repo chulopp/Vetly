@@ -3,12 +3,18 @@ import { analyzeOffer } from '@/lib/engine';
 import { DatabaseNotConfiguredError } from '@/lib/db/client';
 import { createOffer, listOffers } from '@/lib/offers/service';
 import { OFFER_ID_PATTERN, OfferInputSchema, zodToIssues } from '@/lib/validation/offer';
+import { buildMyCookie, COOKIE_NAME, parseMyCookie } from '@/lib/ownershipCookie';
 
 /**
  * POST /api/offers — create an offer analysis (PRD §4.2 Step 3).
  * Zod validates every §3.4 rule (structured 400 on any violation), the pure
  * deterministic engine computes the analysis, and the result is saved to Neon
  * with a generated id.
+ *
+ * On success, the server sets (or updates) the `my_offers` cookie with the new
+ * offer id — this is the authoritative ownership record per PRD v7 §3.1.
+ * The client also mirrors the id in localStorage as a convenience cache, but
+ * the cookie is what /result/[id] and /compare trust server-side.
  */
 export async function POST(request: Request) {
   let body: unknown;
@@ -30,7 +36,23 @@ export async function POST(request: Request) {
 
   try {
     const id = await createOffer(parsed.data, analysis);
-    return NextResponse.json({ id, analysis }, { status: 201 });
+
+    // Read the existing my_offers cookie from the request (if any), append
+    // the new id, and write the updated cookie back in the response.
+    const existingCookie = request.headers.get('cookie');
+    const existingRaw = existingCookie
+      ?.split(';')
+      .map((s) => s.trim())
+      .find((s) => s.startsWith(`${COOKIE_NAME}=`))
+      ?.slice(COOKIE_NAME.length + 1);
+    const decoded = existingRaw ? decodeURIComponent(existingRaw) : undefined;
+    const existingIds = parseMyCookie(decoded);
+    const updatedIds = [...new Set([...existingIds, id])];
+    const setCookieHeader = buildMyCookie(updatedIds);
+
+    const response = NextResponse.json({ id, analysis }, { status: 201 });
+    response.headers.append('Set-Cookie', setCookieHeader);
+    return response;
   } catch (error) {
     if (error instanceof DatabaseNotConfiguredError) {
       return NextResponse.json(

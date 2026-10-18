@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { cookies } from 'next/headers';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import ContractConditions from '@/components/result/ContractConditions';
@@ -13,6 +14,7 @@ import { DatabaseNotConfiguredError } from '@/lib/db/client';
 import { analyzeOffer } from '@/lib/engine';
 import { getOffer, type OfferRecord } from '@/lib/offers/service';
 import { OFFER_ID_PATTERN } from '@/lib/validation/offer';
+import { cookieOwnsOffer, COOKIE_NAME } from '@/lib/ownershipCookie';
 
 async function loadOffer(id: string): Promise<{ offer: OfferRecord | null; dbError: boolean }> {
   try {
@@ -86,6 +88,13 @@ export default async function ResultPage({
   if (dbError) return <DbUnavailableCard />;
   if (!offer) notFound();
 
+  // Server-side ownership check: read the my_offers cookie (set by POST /api/offers).
+  // If the offer id is in the cookie, this is the owner's browser — show owner controls.
+  // Forced-shared routes (share/[id], ?shared, ?readonly, ?public) are always visitor.
+  const cookieStore = await cookies();
+  const myOffersCookie = cookieStore.get(COOKIE_NAME)?.value;
+  const isOwner = !isForcedShared && cookieOwnsOffer(myOffersCookie, offer.id);
+
   const { analysis } = offer;
 
   return (
@@ -107,7 +116,7 @@ export default async function ResultPage({
             <ContractConditions counterOffer={analysis.counterOffer} />
           )}
           {analysis.counterOffer && <DraftMessage offerId={offer.id} />}
-          <OwnerActions offerId={offer.id} forceVisitor={isForcedShared} />
+          <OwnerActions offerId={offer.id} isOwner={isOwner} />
         </div>
       </div>
     </main>
