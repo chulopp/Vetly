@@ -15,6 +15,8 @@ import { CompareTable } from './CompareTable';
  * localStorage is NOT used here — the cookie is authoritative for ownership
  * across both pages (see PRD v7 §3.1 / §4.1).
  */
+export const dynamic = 'force-dynamic';
+
 export default async function ComparePage() {
   const cookieStore = await cookies();
   const rawCookie = cookieStore.get(COOKIE_NAME)?.value;
@@ -64,25 +66,8 @@ export default async function ComparePage() {
             </button>
           </form>
         </div>
-      ) : offers.length === 0 ? (
-        <div className="glass mx-auto mt-8 flex max-w-md flex-col items-center rounded-3xl p-10 text-center animate-fade-up">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/vetly-icon.png" alt="" className="h-14 w-auto" />
-          <h2 className="mt-5 text-lg font-semibold text-ink-100">No saved offers yet</h2>
-          <p className="mt-2 text-sm leading-relaxed text-ink-300">
-            Analyze your first project offer and it&apos;ll show up here — ready to compare side
-            by side.
-          </p>
-          <Link
-            href="/?intake=open"
-            className="mt-6 inline-flex items-center gap-2 rounded-xl bg-ink-100 px-5 py-2.5 text-sm font-semibold text-base-950 transition hover:bg-white"
-          >
-            <Plus className="size-4" />
-            Analyze your first offer
-          </Link>
-        </div>
       ) : (
-        <CompareTable offers={offers} />
+        <CompareTable initialOffers={offers} />
       )}
     </main>
   );

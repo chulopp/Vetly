@@ -51,7 +51,16 @@ export default function OwnerActions({ offerId, isOwner }: OwnerActionsProps) {
     copyTimeoutRef.current = setTimeout(() => setCopied(false), 2500);
   }
 
-  if (!isOwner) {
+  const isClientShare =
+    typeof window !== 'undefined' &&
+    (window.location.pathname.startsWith('/share') ||
+      window.location.pathname.startsWith('/shared') ||
+      window.location.search.includes('shared') ||
+      window.location.search.includes('public') ||
+      window.location.search.includes('visitor') ||
+      window.location.search.includes('readonly'));
+
+  if (!isOwner || isClientShare) {
     return (
       <div className="glass animate-fade-up rounded-2xl p-5 text-center">
         <p className="text-sm text-ink-300">This analysis was shared with you.</p>

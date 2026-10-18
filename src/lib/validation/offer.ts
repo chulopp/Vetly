@@ -105,5 +105,5 @@ export const EMPTY_EXTRACTED_FIELDS: ExtractedFields = {
   flags: null,
 };
 
-/** Offer ids are nanoid(12) — URL-safe alphabet. */
-export const OFFER_ID_PATTERN = /^[A-Za-z0-9_-]{6,16}$/;
+/** Offer ids are nanoid(12) or preset names — URL-safe alphabet. */
+export const OFFER_ID_PATTERN = /^[A-Za-z0-9_-]{1,64}$/;

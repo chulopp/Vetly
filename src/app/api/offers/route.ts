@@ -16,6 +16,8 @@ import { buildMyCookie, COOKIE_NAME, parseMyCookie } from '@/lib/ownershipCookie
  * The client also mirrors the id in localStorage as a convenience cache, but
  * the cookie is what /result/[id] and /compare trust server-side.
  */
+export const dynamic = 'force-dynamic';
+
 export async function POST(request: Request) {
   let body: unknown;
   try {
@@ -39,19 +41,26 @@ export async function POST(request: Request) {
 
     // Read the existing my_offers cookie from the request (if any), append
     // the new id, and write the updated cookie back in the response.
-    const existingCookie = request.headers.get('cookie');
+    const existingCookie = request.headers.get('cookie') ?? undefined;
     const existingRaw = existingCookie
       ?.split(';')
       .map((s) => s.trim())
       .find((s) => s.startsWith(`${COOKIE_NAME}=`))
       ?.slice(COOKIE_NAME.length + 1);
-    const decoded = existingRaw ? decodeURIComponent(existingRaw) : undefined;
-    const existingIds = parseMyCookie(decoded);
-    const updatedIds = [...new Set([...existingIds, id])];
-    const setCookieHeader = buildMyCookie(updatedIds);
+    const existingIds = parseMyCookie(existingRaw);
+    const updatedIds = [...new Set([...existingIds, id])].slice(-50);
 
     const response = NextResponse.json({ id, analysis }, { status: 201 });
-    response.headers.append('Set-Cookie', setCookieHeader);
+    response.cookies.set({
+      name: COOKIE_NAME,
+      value: JSON.stringify(updatedIds),
+      path: '/',
+      maxAge: 60 * 60 * 24 * 30, // 30 days
+      sameSite: 'lax',
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+    });
+    response.headers.append('Set-Cookie', buildMyCookie(updatedIds));
     return response;
   } catch (error) {
     if (error instanceof DatabaseNotConfiguredError) {

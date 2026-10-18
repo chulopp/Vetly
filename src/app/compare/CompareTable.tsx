@@ -1,12 +1,14 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { ArrowDown, ArrowUp, ArrowUpDown } from 'lucide-react';
+import { ArrowDown, ArrowUp, ArrowUpDown, Plus } from 'lucide-react';
 import { ActionBadge, TierBadge } from '@/components/ui/badges';
 import { formatMoney } from '@/lib/currency';
 import { formatMargin } from '@/lib/engine';
 import type { RecommendAction, RiskTier } from '@/lib/engine/types';
+import { getMyOffers } from '@/lib/myOffers';
 import type { OfferRecord } from '@/lib/offers/service';
 import { cn } from '@/lib/utils';
 
@@ -31,13 +33,35 @@ const COLUMNS: Array<{ key: SortKey; label: string }> = [
 ];
 
 /**
- * Client-side sortable table for the Compare page (PRD §4.3).
- * Receives server-fetched offers as props — data loading is done in the
- * parent Server Component (compare/page.tsx) via the my_offers cookie.
+ * Client-side table for the Compare page (PRD §4.3).
+ * Primary: uses server-fetched offers from my_offers cookie.
+ * Resilient fallback: if server had no cookie, checks localStorage mirror.
+ * If no offers exist anywhere, shows the designed empty state.
  */
-export function CompareTable({ offers }: { offers: OfferRecord[] }) {
+export function CompareTable({ initialOffers = [] }: { initialOffers?: OfferRecord[] }) {
   const router = useRouter();
+  const [offers, setOffers] = useState<OfferRecord[]>(initialOffers);
   const [sort, setSort] = useState<{ key: SortKey; dir: SortDir }>({ key: 'createdAt', dir: 'desc' });
+
+  useEffect(() => {
+    if (initialOffers.length > 0) {
+      setOffers(initialOffers);
+      return;
+    }
+
+    // Client mirror fallback: if server saw no cookie, check localStorage
+    const localIds = getMyOffers();
+    if (localIds.length > 0) {
+      fetch(`/api/offers?ids=${encodeURIComponent(localIds.join(','))}`)
+        .then((res) => (res.ok ? res.json() : null))
+        .then((data) => {
+          if (data && Array.isArray(data.offers) && data.offers.length > 0) {
+            setOffers(data.offers);
+          }
+        })
+        .catch(() => {});
+    }
+  }, [initialOffers]);
 
   const sorted = useMemo(() => {
     const list = [...offers];
@@ -66,6 +90,27 @@ export function CompareTable({ offers }: { offers: OfferRecord[] }) {
       prev.key === key
         ? { key, dir: prev.dir === 'asc' ? 'desc' : 'asc' }
         : { key, dir: key === 'createdAt' ? 'desc' : 'asc' },
+    );
+  }
+
+  if (offers.length === 0) {
+    return (
+      <div className="glass mx-auto mt-8 flex max-w-md flex-col items-center rounded-3xl p-10 text-center animate-fade-up">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src="/vetly-icon.png" alt="" className="h-14 w-auto" />
+        <h2 className="mt-5 text-lg font-semibold text-ink-100">No saved offers yet</h2>
+        <p className="mt-2 text-sm leading-relaxed text-ink-300">
+          Analyze your first project offer and it&apos;ll show up here — ready to compare side
+          by side.
+        </p>
+        <Link
+          href="/?intake=open"
+          className="mt-6 inline-flex items-center gap-2 rounded-xl bg-ink-100 px-5 py-2.5 text-sm font-semibold text-base-950 transition hover:bg-white"
+        >
+          <Plus className="size-4" />
+          Analyze your first offer
+        </Link>
+      </div>
     );
   }
 

@@ -30,18 +30,7 @@ async function loadOffer(id: string): Promise<{ offer: OfferRecord | null; dbErr
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
   const { id } = await params;
   if (!OFFER_ID_PATTERN.test(id)) return { title: 'Offer not found - Vetly' };
-  let { offer } = await loadOffer(id);
-  if (!offer) {
-    const preset = PRESETS.find((p) => p.id === id);
-    if (preset) {
-      offer = {
-        id: preset.id,
-        createdAt: new Date().toISOString(),
-        input: preset.input,
-        analysis: analyzeOffer(preset.input),
-      };
-    }
-  }
+  const { offer } = await loadOffer(id);
   if (!offer) return { title: 'Offer not found - Vetly' };
   return {
     title: `${offer.analysis.recommendAction} - Vetly offer analysis`,
@@ -55,16 +44,21 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
  * column in the same priority order on mobile. Doubles as the public shared
  * view: ownership (localStorage) only toggles the owner toolbar.
  */
+export const dynamic = 'force-dynamic';
+
 export default async function ResultPage({
   params,
   searchParams,
+  forceShared = false,
 }: {
   params: Promise<{ id: string }>;
   searchParams?: Promise<{ [key: string]: string | string[] | undefined }>;
+  forceShared?: boolean;
 }) {
   const { id } = await params;
   const search = searchParams ? await searchParams : {};
   const isForcedShared =
+    forceShared ||
     search.shared !== undefined ||
     search.view === 'shared' ||
     search.readonly !== undefined ||
@@ -72,28 +66,20 @@ export default async function ResultPage({
 
   if (!OFFER_ID_PATTERN.test(id)) notFound();
 
-  let { offer, dbError } = await loadOffer(id);
-  if (!offer && !dbError) {
-    const preset = PRESETS.find((p) => p.id === id);
-    if (preset) {
-      offer = {
-        id: preset.id,
-        createdAt: new Date().toISOString(),
-        input: preset.input,
-        analysis: analyzeOffer(preset.input),
-      };
-    }
-  }
+  const { offer, dbError } = await loadOffer(id);
 
   if (dbError) return <DbUnavailableCard />;
   if (!offer) notFound();
 
+  // Presets are demo templates and never owned by individual sessions
+  const isPreset = PRESETS.some((p) => p.id === offer.id || p.id === id);
+
   // Server-side ownership check: read the my_offers cookie (set by POST /api/offers).
   // If the offer id is in the cookie, this is the owner's browser — show owner controls.
-  // Forced-shared routes (share/[id], ?shared, ?readonly, ?public) are always visitor.
+  // Forced-shared routes (share/[id], ?shared, ?readonly, ?public) and presets are always visitor.
   const cookieStore = await cookies();
   const myOffersCookie = cookieStore.get(COOKIE_NAME)?.value;
-  const isOwner = !isForcedShared && cookieOwnsOffer(myOffersCookie, offer.id);
+  const isOwner = !isForcedShared && !isPreset && cookieOwnsOffer(myOffersCookie, offer.id);
 
   const { analysis } = offer;
 
