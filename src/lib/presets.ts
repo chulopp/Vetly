@@ -1,22 +1,18 @@
-import { Building2, Sparkles, TriangleAlert } from 'lucide-react';
-import type { LucideIcon } from 'lucide-react';
 import type { OfferInput } from '@/lib/engine/types';
 
-export interface Preset {
+export interface PresetDefinition {
   id: string;
   name: string;
   blurb: string;
-  icon: LucideIcon;
   input: OfferInput;
 }
 
 /** The three 1-click preset scenarios (PRD §3.5.3) — locked plan decision #4 values. */
-export const PRESETS: Preset[] = [
+export const PRESETS: PresetDefinition[] = [
   {
     id: 'ideal-saas-mvp',
     name: 'Ideal SaaS MVP',
     blurb: 'Fair margin, zero risk — an easy accept.',
-    icon: Sparkles,
     input: {
       budget: 8000,
       currency: 'USD',
@@ -33,7 +29,6 @@ export const PRESETS: Preset[] = [
     id: 'scope-creep-trap',
     name: 'Scope Creep Trap',
     blurb: 'Deep deficit, every red flag — reject fast.',
-    icon: TriangleAlert,
     input: {
       budget: 1500,
       currency: 'USD',
@@ -50,7 +45,6 @@ export const PRESETS: Preset[] = [
     id: 'corporate-net90',
     name: 'High-Pay Corporate Net-90',
     blurb: 'Great rate, risky terms — negotiate.',
-    icon: Building2,
     input: {
       budget: 18000,
       currency: 'USD',
@@ -66,7 +60,7 @@ export const PRESETS: Preset[] = [
 ];
 
 /** Matches preset by exact id, test-id alias, or index alias. */
-export function findPreset(id: string): Preset | undefined {
+export function findPreset(id: string): PresetDefinition | undefined {
   const norm = id.toLowerCase().trim();
   return PRESETS.find(
     (p) =>

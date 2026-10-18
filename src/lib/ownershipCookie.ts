@@ -23,7 +23,11 @@ const MAX_AGE = 60 * 60 * 24 * 30; // 30 days in seconds
 export function parseMyCookie(raw: string | undefined): string[] {
   if (!raw) return [];
   try {
-    let text = raw;
+    let text = raw.trim();
+    // Strip RFC 6265 surrounding quotes if present
+    if (text.startsWith('"') && text.endsWith('"') && text.length >= 2) {
+      text = text.slice(1, -1).trim();
+    }
     if (text.includes('%')) {
       try {
         text = decodeURIComponent(text);
@@ -31,9 +35,21 @@ export function parseMyCookie(raw: string | undefined): string[] {
         // ignore URI decode error and try JSON.parse directly
       }
     }
-    const parsed: unknown = JSON.parse(text);
-    if (!Array.isArray(parsed)) return [];
-    return parsed.filter((id): id is string => typeof id === 'string' && id.length > 0);
+    if (text.startsWith('"') && text.endsWith('"') && text.length >= 2) {
+      text = text.slice(1, -1).trim();
+    }
+    let parsed: unknown = JSON.parse(text);
+    if (typeof parsed === 'string') {
+      try {
+        parsed = JSON.parse(parsed);
+      } catch {
+        return [];
+      }
+    }
+    if (Array.isArray(parsed)) {
+      return parsed.filter((id): id is string => typeof id === 'string' && id.length > 0);
+    }
+    return [];
   } catch {
     return [];
   }

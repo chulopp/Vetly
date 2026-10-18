@@ -9,10 +9,10 @@ import DraftMessage from '@/components/result/DraftMessage';
 import OwnerActions from '@/components/result/OwnerActions';
 import RateComparison from '@/components/result/RateComparison';
 import RiskBreakdown from '@/components/result/RiskBreakdown';
-import { PRESETS } from '@/components/home/PresetChips';
 import { DatabaseNotConfiguredError } from '@/lib/db/client';
 import { analyzeOffer } from '@/lib/engine';
 import { getOffer, type OfferRecord } from '@/lib/offers/service';
+import { findPreset } from '@/lib/presets';
 import { OFFER_ID_PATTERN } from '@/lib/validation/offer';
 import { cookieOwnsOffer, COOKIE_NAME } from '@/lib/ownershipCookie';
 
@@ -72,7 +72,7 @@ export default async function ResultPage({
   if (!offer) notFound();
 
   // Presets are demo templates and never owned by individual sessions
-  const isPreset = PRESETS.some((p) => p.id === offer.id || p.id === id);
+  const isPreset = Boolean(findPreset(offer.id) || findPreset(id));
 
   // Server-side ownership check: read the my_offers cookie (set by POST /api/offers).
   // If the offer id is in the cookie, this is the owner's browser — show owner controls.

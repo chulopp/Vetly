@@ -53,14 +53,13 @@ export async function POST(request: Request) {
     const response = NextResponse.json({ id, analysis }, { status: 201 });
     response.cookies.set({
       name: COOKIE_NAME,
-      value: JSON.stringify(updatedIds),
+      value: encodeURIComponent(JSON.stringify(updatedIds)),
       path: '/',
       maxAge: 60 * 60 * 24 * 30, // 30 days
       sameSite: 'lax',
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
     });
-    response.headers.append('Set-Cookie', buildMyCookie(updatedIds));
     return response;
   } catch (error) {
     if (error instanceof DatabaseNotConfiguredError) {

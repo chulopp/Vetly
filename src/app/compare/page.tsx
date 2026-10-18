@@ -17,10 +17,22 @@ import { CompareTable } from './CompareTable';
  */
 export const dynamic = 'force-dynamic';
 
-export default async function ComparePage() {
+export default async function ComparePage({
+  searchParams,
+}: {
+  searchParams?: Promise<{ [key: string]: string | string[] | undefined }>;
+}) {
+  const search = searchParams ? await searchParams : {};
+  const queryIds =
+    typeof search.ids === 'string'
+      ? search.ids.split(',').map((s) => s.trim()).filter(Boolean)
+      : [];
+
   const cookieStore = await cookies();
   const rawCookie = cookieStore.get(COOKIE_NAME)?.value;
-  const ids = parseMyCookie(rawCookie ? decodeURIComponent(rawCookie) : undefined);
+  const cookieIds = parseMyCookie(rawCookie);
+
+  const ids = [...new Set([...queryIds, ...cookieIds])].slice(-50);
 
   let offers: OfferRecord[] = [];
   let loadError = false;
