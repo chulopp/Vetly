@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { Plus } from 'lucide-react';
 
 export default function NotFound() {
   return (
@@ -8,12 +9,21 @@ export default function NotFound() {
         <p className="mt-2 text-sm leading-relaxed text-ink-300">
           The link may be mistyped, or the page moved.
         </p>
-        <Link
-          href="/"
-          className="mt-6 inline-flex rounded-xl bg-ink-100 px-5 py-2.5 text-sm font-semibold text-base-950 transition hover:bg-white"
-        >
-          Back to analyzing deals
-        </Link>
+        <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
+          <Link
+            href="/"
+            className="inline-flex items-center gap-2 rounded-xl bg-ink-100 px-5 py-2.5 text-sm font-semibold text-base-950 transition hover:bg-white"
+          >
+            <Plus className="size-4" />
+            Analyze your own deal
+          </Link>
+          <Link
+            href="/"
+            className="inline-flex items-center gap-2 rounded-xl border border-white/15 bg-white/[0.03] px-5 py-2.5 text-sm font-medium text-ink-300 transition hover:border-white/30 hover:text-ink-100"
+          >
+            Back to analyzing deals
+          </Link>
+        </div>
       </div>
     </main>
   );

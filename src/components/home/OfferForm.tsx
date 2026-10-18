@@ -4,7 +4,7 @@ import { ChevronDown } from 'lucide-react';
 import { CURRENCIES } from '@/lib/currency';
 import type { OfferFlag } from '@/lib/engine/types';
 import { cn } from '@/lib/utils';
-import type { FormFieldKey, FormState } from './formTypes';
+import { REQUIRED_NUMERIC, type FormFieldKey, type FormState, type NumericFormKey } from './formTypes';
 
 interface OfferFormProps {
   form: FormState;
@@ -55,11 +55,13 @@ export default function OfferForm({ form, errors, onFieldChange, onFieldBlur, on
       {/* currency */}
       <div>
         <label htmlFor="field-currency" className="text-xs font-medium text-ink-300">
-          Currency
+          Currency <span className="ml-1 text-negotiate" aria-hidden="true">*</span>
         </label>
         <div className="relative mt-1.5">
           <select
             id="field-currency"
+            required
+            aria-required="true"
             value={form.currency}
             onChange={(event) => onFieldChange('currency', event.target.value)}
             className={cn(inputClass(false), 'appearance-none pr-9')}
@@ -134,16 +136,21 @@ function NumericField({
   onChange: (key: FormFieldKey, value: string) => void;
   onBlur: (key: FormFieldKey) => void;
 }) {
+  const isRequired = REQUIRED_NUMERIC.includes(field.key as NumericFormKey);
+
   return (
     <div>
       <label htmlFor={`field-${field.key}`} className="text-xs font-medium text-ink-300">
         {field.label}
+        {isRequired && <span className="ml-1 text-negotiate" aria-hidden="true">*</span>}
       </label>
       <input
         id={`field-${field.key}`}
         type="text"
         inputMode="decimal"
         autoComplete="off"
+        required={isRequired}
+        aria-required={isRequired}
         value={value[field.key as keyof FormState] as string}
         placeholder={field.placeholder}
         onChange={(event) => onChange(field.key, event.target.value)}

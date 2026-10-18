@@ -142,7 +142,7 @@ export default function ComparePage() {
                 by side.
               </p>
               <Link
-                href="/"
+                href="/?intake=open"
                 className="mt-6 inline-flex items-center gap-2 rounded-xl bg-ink-100 px-5 py-2.5 text-sm font-semibold text-base-950 transition hover:bg-white"
               >
                 <Plus className="size-4" />

@@ -69,27 +69,43 @@ export const PRESETS: Preset[] = [
 ];
 
 interface PresetChipsProps {
-  onApply: (input: OfferInput) => void;
+  onApply: (input: OfferInput, id?: string) => void;
+  activeId?: string | null;
   className?: string;
 }
 
-export default function PresetChips({ onApply, className }: PresetChipsProps) {
+export default function PresetChips({ onApply, activeId, className }: PresetChipsProps) {
   return (
     <div className={cn('grid gap-2.5 sm:grid-cols-3', className)}>
-      {PRESETS.map((preset) => (
-        <button
-          key={preset.id}
-          type="button"
-          onClick={() => onApply(preset.input)}
-          className="glass rounded-xl px-3.5 py-3 text-left transition-all hover:border-white/25 hover:bg-white/[0.08] active:scale-[0.98]"
-        >
-          <span className="flex items-center gap-2">
-            <preset.icon className="size-4 shrink-0 text-ink-300" />
-            <span className="text-sm font-medium text-ink-100">{preset.name}</span>
-          </span>
-          <span className="mt-1 block text-[11px] leading-snug text-ink-500">{preset.blurb}</span>
-        </button>
-      ))}
+      {PRESETS.map((preset) => {
+        const isActive = activeId === preset.id;
+        return (
+          <button
+            key={preset.id}
+            type="button"
+            aria-pressed={isActive}
+            data-testid={`preset-${preset.id}`}
+            data-state={isActive ? 'active' : 'inactive'}
+            onClick={() => onApply(preset.input, preset.id)}
+            className={cn(
+              'glass rounded-xl px-3.5 py-3 text-left transition-all active:scale-[0.98]',
+              isActive
+                ? 'border-ink-100/50 bg-white/[0.12] ring-1 ring-white/20'
+                : 'hover:border-white/25 hover:bg-white/[0.08]',
+            )}
+          >
+            <span className="flex items-center gap-2">
+              <preset.icon
+                className={cn('size-4 shrink-0 transition-colors', isActive ? 'text-ink-100' : 'text-ink-300')}
+              />
+              <span className={cn('text-sm font-medium', isActive ? 'text-white' : 'text-ink-100')}>
+                {preset.name}
+              </span>
+            </span>
+            <span className="mt-1 block text-[11px] leading-snug text-ink-500">{preset.blurb}</span>
+          </button>
+        );
+      })}
     </div>
   );
 }
