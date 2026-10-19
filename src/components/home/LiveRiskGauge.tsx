@@ -66,7 +66,7 @@ export default function LiveRiskGauge({ score, tier, proximity, contributions, a
         {contributions.map((contribution) => (
           <li key={contribution.source} className="flex items-center justify-between gap-2 text-xs">
             <span className="text-ink-300">
-              {contribution.label} <span className="text-ink-500">— {contribution.detail}</span>
+              {contribution.label} <span className="text-ink-500">({contribution.detail})</span>
             </span>
             <span
               className={cn(
@@ -81,7 +81,7 @@ export default function LiveRiskGauge({ score, tier, proximity, contributions, a
       </ul>
       {assumingDefaults && (
         <p className="mt-3 text-[11px] leading-snug text-ink-500">
-          Deposit and payment terms assumed 0 — enter them to refine the score.
+          Deposit and terms assumed 0. Enter values to refine score.
         </p>
       )}
     </div>

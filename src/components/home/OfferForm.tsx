@@ -1,6 +1,6 @@
 'use client';
 
-import { ChevronDown } from 'lucide-react';
+import { CaretDown } from '@phosphor-icons/react';
 import { CURRENCIES } from '@/lib/currency';
 import type { OfferFlag } from '@/lib/engine/types';
 import { cn } from '@/lib/utils';
@@ -22,13 +22,13 @@ function inputClass(hasError: boolean): string {
 }
 
 const NUMERIC_FIELDS: Array<{ key: FormFieldKey; label: string; placeholder: string; hint: string }> = [
-  { key: 'budget', label: 'Project budget / quote', placeholder: 'e.g. 8000', hint: 'The total the client offered, in the selected currency.' },
-  { key: 'estimatedHours', label: 'Estimated hours', placeholder: 'e.g. 120', hint: 'Your realistic estimate of the work.' },
-  { key: 'targetRate', label: 'Your target hourly rate', placeholder: 'e.g. 50', hint: 'What you need to earn per hour.' },
-  { key: 'platformFeePercent', label: 'Platform fee %', placeholder: '0', hint: '0 direct · 3 Wise/Stripe · 10 Upwork · 20 Fiverr · empty = 0.' },
-  { key: 'depositPercent', label: 'Upfront deposit %', placeholder: 'e.g. 50', hint: '0–100 · empty = 0 (no deposit).' },
-  { key: 'paymentTermsDays', label: 'Payment terms (days)', placeholder: 'e.g. 7, 30, 90', hint: 'Days until you get paid · empty = 0 (due upfront).' },
-  { key: 'allowedRevisions', label: 'Allowed revisions', placeholder: 'e.g. 2', hint: 'Whole rounds · 0–2 cost no extra hours.' },
+  { key: 'budget', label: 'Project budget / quote', placeholder: 'e.g. 8000', hint: '' },
+  { key: 'estimatedHours', label: 'Estimated hours', placeholder: 'e.g. 120', hint: '' },
+  { key: 'targetRate', label: 'Your target hourly rate', placeholder: 'e.g. 50', hint: '' },
+  { key: 'platformFeePercent', label: 'Platform fee %', placeholder: '0', hint: 'Direct 0 · Stripe 3 · Upwork 10 · Fiverr 20' },
+  { key: 'depositPercent', label: 'Upfront deposit %', placeholder: 'e.g. 50', hint: 'Percentage paid upfront.' },
+  { key: 'paymentTermsDays', label: 'Payment terms (days)', placeholder: 'e.g. 7, 30, 90', hint: 'Days until payment is due.' },
+  { key: 'allowedRevisions', label: 'Allowed revisions', placeholder: 'e.g. 2', hint: 'Rounds included in quote.' },
 ];
 
 const FLAG_OPTIONS: Array<{ flag: OfferFlag; label: string; hint: string }> = [
@@ -70,15 +70,12 @@ export default function OfferForm({ form, errors, onFieldChange, onFieldBlur, on
           >
             {CURRENCIES.map((currency) => (
               <option key={currency.code} value={currency.code} className="bg-base-900 text-ink-100">
-                {currency.code} — {currency.name}
+                {currency.code} ({currency.name})
               </option>
             ))}
           </select>
-          <ChevronDown className="pointer-events-none absolute right-3 top-1/2 size-4 -translate-y-1/2 text-ink-500" />
+          <CaretDown className="pointer-events-none absolute right-3 top-1/2 size-4 -translate-y-1/2 text-ink-500" weight="light" />
         </div>
-        <p className="mt-1.5 text-[11px] leading-snug text-ink-500">
-          The offer&apos;s native currency — budget, target rate, and results all stay in it.
-        </p>
       </div>
 
       {NUMERIC_FIELDS.slice(1).map((field) => (
@@ -120,7 +117,7 @@ export default function OfferForm({ form, errors, onFieldChange, onFieldBlur, on
           })}
         </div>
         <p className="mt-1.5 text-[11px] leading-snug text-ink-500">
-          Toggle any that apply — the live risk score updates as you go.
+          Select any that apply to update risk.
         </p>
       </div>
     </>
@@ -165,9 +162,9 @@ function NumericField({
       />
       {error ? (
         <p className="mt-1.5 text-xs text-reject">{error}</p>
-      ) : (
+      ) : field.hint ? (
         <p className="mt-1.5 text-[11px] leading-snug text-ink-500">{field.hint}</p>
-      )}
+      ) : null}
     </div>
   );
 }
