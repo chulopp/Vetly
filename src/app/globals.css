@@ -34,10 +34,11 @@ html {
   color-scheme: dark;
 }
 
-/* Volta-style atmospheric aurora backdrop — 99% pixel-sampled exact spectrum */
+/* Volta-style atmospheric aurora backdrop — with central emerald glow */
 body {
   background-color: #0c0e14;
   background-image:
+    radial-gradient(750px 480px at 50% 28%, rgba(61, 220, 132, 0.22), transparent 70%),
     radial-gradient(850px 550px at 12% 12%, rgba(42, 56, 96, 0.9), transparent 70%),
     radial-gradient(750px 500px at 0% 38%, rgba(35, 45, 78, 0.8), transparent 65%),
     radial-gradient(900px 600px at 88% 18%, rgba(58, 42, 72, 0.88), transparent 70%),
