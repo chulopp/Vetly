@@ -34,7 +34,7 @@ export default function SmartPasteBox({ status, message, onExtract }: SmartPaste
         value={text}
         onChange={(event) => setText(event.target.value)}
         placeholder={`Paste the client's message or email here — any language.\nExample: "We have a dashboard project, budget around $8,000, about 120 hours of work, 50% upfront, net 7, two revision rounds."`}
-        className="mt-2 w-full resize-y rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-3.5 text-sm leading-relaxed text-ink-100 outline-none transition placeholder:text-ink-500 focus:border-white/30 focus:ring-2 focus:ring-white/10"
+        className="mt-2 w-full resize-y rounded-2xl border border-white/10 bg-black/40 px-4 py-3.5 text-sm leading-relaxed text-ink-100 outline-none transition placeholder:text-ink-500 shadow-[inset_0_2px_4px_rgba(0,0,0,0.4)] focus:border-white/30 focus:ring-2 focus:ring-white/10"
       />
       <div className="mt-3 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <p className="flex items-start gap-1.5 text-xs leading-relaxed text-ink-500 sm:max-w-[340px]">

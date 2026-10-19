@@ -1,50 +1,53 @@
-import { Calculator, Send, ShieldAlert } from 'lucide-react';
+'use client';
 
-const VALUE_PROPS = [
-  {
-    icon: Calculator,
-    label: 'Real rate, not the sticker number',
-    tone: 'text-accept',
-  },
-  {
-    icon: ShieldAlert,
-    label: 'Client risk, scored automatically',
-    tone: 'text-negotiate',
-  },
-  {
-    icon: Send,
-    label: 'A counter-offer ready to send',
-    tone: 'text-ink-100',
-  },
-];
+interface HeroProps {
+  onStartAnalyzing?: () => void;
+  cardExpanded?: boolean;
+}
 
 /**
- * Hero (PRD §3.5.1): no separate landing page — the "understand it in 30
- * seconds" block sits directly above the entry points. Above the fold on
- * desktop and mobile.
+ * Hero section styled after Volta (volta.net):
+ * - Pill badge replacing centered logo ("Introducing Vetly 1.0 →")
+ * - Punchy 4-word headline ("Know your real rate.")
+ * - Tight 2-line subheadline without em-dashes
+ * - Volta-style pill CTA ("Start analyzing →") centered on a subtle horizontal divider line
  */
-export default function Hero() {
+export default function Hero({ onStartAnalyzing, cardExpanded }: HeroProps) {
   return (
-    <section className="pt-32 pb-10 text-center md:pt-40">
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src="/vetly-full.png" alt="Vetly" className="mx-auto h-9 w-auto" />
-      <h1 className="mx-auto mt-6 max-w-3xl text-3xl font-semibold leading-tight tracking-tight text-ink-100 md:text-5xl">
-        Know what a project offer is really worth before you say yes.
+    <section className="pt-28 pb-4 text-center md:pt-36">
+      {/* Pill Badge ala Volta "See what's new in v1.17.0 →" */}
+      <button
+        type="button"
+        onClick={onStartAnalyzing}
+        className="inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-white/[0.04] px-3.5 py-1 text-xs font-medium text-ink-300 shadow-sm backdrop-blur-sm transition-colors hover:border-white/30 hover:text-ink-100"
+      >
+        <span>Introducing Vetly 1.0</span>
+        <span className="text-white/60">→</span>
+      </button>
+
+      {/* 4-word bold headline with Volta tight tracking */}
+      <h1 className="mx-auto mt-5 max-w-2xl text-4xl font-bold tracking-tight text-white sm:text-6xl sm:leading-[1.1]">
+        Know your real rate.
       </h1>
-      <p className="mx-auto mt-4 max-w-2xl text-base leading-relaxed text-ink-300 md:text-lg">
-        The real hourly rate after fees and scope creep, a scored client risk, and a clear verdict —
-        with a counter-offer ready to send — in seconds.
+
+      {/* Clean 2-line subheadline */}
+      <p className="mx-auto mt-4 max-w-xl text-sm leading-relaxed text-ink-300 sm:text-base">
+        Real hourly rate after fees and scope creep, client risk scoring, and counter-offers ready to send in seconds.
       </p>
-      <div className="mx-auto mt-8 grid max-w-3xl gap-3 sm:grid-cols-3">
-        {VALUE_PROPS.map((prop) => (
-          <div
-            key={prop.label}
-            className="glass flex items-center gap-3 rounded-2xl px-4 py-3.5 text-left"
-          >
-            <prop.icon className={`size-5 shrink-0 ${prop.tone}`} />
-            <span className="text-sm font-medium text-ink-100">{prop.label}</span>
-          </div>
-        ))}
+
+      {/* Volta-style CTA with horizontal divider line */}
+      <div className="relative mx-auto mt-8 flex max-w-xl items-center justify-center">
+        <div className="absolute inset-x-0 h-px bg-white/10" />
+        <button
+          type="button"
+          onClick={onStartAnalyzing}
+          aria-expanded={cardExpanded}
+          aria-controls="analyze"
+          className="relative z-10 flex items-center gap-2 rounded-full border border-white/20 bg-[#121520] px-6 py-2.5 text-sm font-medium text-white shadow-lg backdrop-blur-md transition-all hover:border-white/40 hover:bg-[#181d2c] active:scale-[0.98]"
+        >
+          <span>Start analyzing</span>
+          <span className="text-ink-300">→</span>
+        </button>
       </div>
     </section>
   );

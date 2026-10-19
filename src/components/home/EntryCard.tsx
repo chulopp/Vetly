@@ -31,13 +31,18 @@ import {
   type FormState,
 } from './formTypes';
 
+interface EntryCardProps {
+  expanded?: boolean;
+  onExpand?: () => void;
+}
+
 /**
  * The entry card (PRD §4.3 Home): Smart Paste as the primary element at the
  * top, preset chips below it, the manual form behind a collapsed accordion,
  * and the live risk gauge as a second column (desktop) / above the submit
  * button (mobile) once a risk-relevant field is touched.
  */
-export default function EntryCard() {
+export default function EntryCard({ expanded, onExpand }: EntryCardProps = {}) {
   const router = useRouter();
 
   const [form, setForm] = useState<FormState>(EMPTY_FORM);
@@ -46,6 +51,7 @@ export default function EntryCard() {
   const [touched, setTouched] = useState<Partial<Record<FormFieldKey, boolean>>>({});
   const [serverFieldErrors, setServerFieldErrors] = useState<Partial<Record<FormFieldKey, string>>>({});
   const [formOpen, setFormOpen] = useState(false);
+  const [internalExpanded, setInternalExpanded] = useState(false);
   const [paste, setPaste] = useState<{ status: PasteStatus; message: string | null }>({
     status: 'idle',
     message: null,
@@ -53,12 +59,16 @@ export default function EntryCard() {
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
 
+  const isExpanded = expanded ?? internalExpanded;
+
   // ── Duplicate & edit: /?prefill=<id> populates the form (PRD §4.2 Step 4) ──
   // ── Intake parameter: /?intake=open expands the form (from compare empty-state CTA) ──
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     if (params.get('intake') === 'open') {
       setFormOpen(true);
+      setInternalExpanded(true);
+      if (onExpand) onExpand();
     }
     const prefillId = params.get('prefill');
     if (!prefillId) return;
@@ -69,6 +79,8 @@ export default function EntryCard() {
         if (cancelled || !data?.offer?.input) return;
         setForm(inputToForm(data.offer.input as OfferInput));
         setFormOpen(true);
+        setInternalExpanded(true);
+        if (onExpand) onExpand();
       })
       .catch(() => {
         // a broken prefill just leaves the empty form — never blocks the flow
@@ -76,7 +88,7 @@ export default function EntryCard() {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [onExpand]);
 
   // ── Field-level validation (same Zod schema the API uses) ──
 
@@ -163,6 +175,8 @@ export default function EntryCard() {
     setServerFieldErrors({});
     setSubmitError(null);
     setFormOpen(true);
+    setInternalExpanded(true);
+    if (onExpand) onExpand();
   }
 
   function applyExtracted(fields: ExtractedFields) {
@@ -218,6 +232,8 @@ export default function EntryCard() {
         const resolved = Object.values(fields).filter((value) => value !== null).length;
         applyExtracted(fields);
         setFormOpen(true);
+        setInternalExpanded(true);
+        if (onExpand) onExpand();
 
         // Build a message that calls out any still-empty required fields so the
         // user (and TestSprite) knows exactly what still needs filling.
@@ -241,10 +257,14 @@ export default function EntryCard() {
       } else {
         // graceful fallback: manual entry, never blocks the core flow (PRD §3.3)
         setFormOpen(true);
+        setInternalExpanded(true);
+        if (onExpand) onExpand();
         setPaste({ status: 'error', message: "Couldn't extract from that message — fill the form manually." });
       }
     } catch {
       setFormOpen(true);
+      setInternalExpanded(true);
+      if (onExpand) onExpand();
       setPaste({ status: 'error', message: "Couldn't extract — check your connection and fill the form manually." });
     }
   }
@@ -317,11 +337,17 @@ export default function EntryCard() {
     }
   }
 
-  // ── Render ──
-
   return (
-    <section id="analyze" className="mx-auto w-full max-w-[700px]">
-      <div className="glass-strong rounded-3xl p-5 md:p-7">
+    <section
+      id="analyze"
+      className={cn(
+        'mx-auto w-full max-w-[700px] transition-all duration-500 ease-out',
+        !isExpanded
+          ? 'pointer-events-none my-0 max-h-0 overflow-hidden opacity-0'
+          : 'my-6 max-h-[3500px] opacity-100 animate-fade-up',
+      )}
+    >
+      <div className="card-volta p-5 md:p-7">
         <SmartPasteBox status={paste.status} message={paste.message} onExtract={handleExtract} />
 
         <PresetChips className="mt-5" onApply={applyPreset} activeId={activePresetId} />
