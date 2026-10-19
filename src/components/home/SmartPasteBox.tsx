@@ -45,16 +45,16 @@ export default function SmartPasteBox({ status, message, onExtract }: SmartPaste
           type="button"
           disabled={status === 'loading'}
           onClick={() => onExtract(text)}
-          className="flex items-center justify-center gap-2 rounded-xl bg-ink-100 px-5 py-2.5 text-sm font-semibold text-base-950 transition hover:bg-white disabled:cursor-wait disabled:opacity-60"
+          className="btn-volta-cta flex items-center justify-center gap-2 rounded-xl px-5 py-2.5 text-sm font-medium text-white transition active:scale-[0.98] disabled:cursor-wait disabled:opacity-60"
         >
           {status === 'loading' ? (
             <>
-              <Spinner className="size-3.5" />
+              <Spinner className="size-3.5 text-white" />
               Reading the message…
             </>
           ) : (
             <>
-              <MagicWand className="size-4" weight="light" />
+              <MagicWand className="size-4 text-white" weight="light" />
               Extract the offer details
             </>
           )}

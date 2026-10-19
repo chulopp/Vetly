@@ -396,11 +396,11 @@ export default function EntryCard({ expanded, onExpand }: EntryCardProps = {}) {
                 form="offer-form"
                 type="submit"
                 disabled={submitting}
-                className="flex w-full items-center justify-center gap-2 rounded-xl bg-ink-100 px-5 py-3 text-sm font-semibold text-base-950 transition hover:bg-white disabled:cursor-wait disabled:opacity-60"
+                className="btn-volta-cta flex w-full items-center justify-center gap-2 rounded-xl px-5 py-3 text-sm font-semibold text-white transition active:scale-[0.98] disabled:cursor-wait disabled:opacity-60"
               >
                 {submitting ? (
                   <>
-                    <Spinner className="size-3.5" />
+                    <Spinner className="size-3.5 text-white" />
                     Analyzing your offer…
                   </>
                 ) : (
