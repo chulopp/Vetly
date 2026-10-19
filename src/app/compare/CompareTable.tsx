@@ -105,10 +105,10 @@ export function CompareTable({ initialOffers = [] }: { initialOffers?: OfferReco
         </p>
         <Link
           href="/?intake=open"
-          className="mt-6 inline-flex items-center gap-2 rounded-xl bg-ink-100 px-5 py-2.5 text-sm font-semibold text-base-950 transition hover:bg-white"
+          className="btn-volta-cta mt-6 inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-medium text-white active:scale-[0.98]"
         >
-          <Plus className="size-4" />
-          Analyze your first offer
+          <Plus className="size-4 text-white" />
+          <span>Analyze your first offer</span>
         </Link>
         <Link
           href="/compare?sample=true"
@@ -120,17 +120,9 @@ export function CompareTable({ initialOffers = [] }: { initialOffers?: OfferReco
     );
   }
 
-  const currencies = new Set(offers.map((offer) => offer.input.currency));
-  const mixedCurrencies = currencies.size > 1;
-
   return (
     <>
-      {mixedCurrencies && (
-        <p className="mt-5 text-xs text-ink-500">
-          Each amount is shown in its offer&apos;s native currency.
-        </p>
-      )}
-      <div className="glass mt-4 overflow-hidden rounded-2xl">
+      <div className="glass mt-6 overflow-hidden rounded-2xl">
         <div className="overflow-x-auto">
           <table className="w-full min-w-[560px] text-sm">
             <thead>

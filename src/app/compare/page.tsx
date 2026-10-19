@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { cookies } from 'next/headers';
-import { Plus } from 'lucide-react';
+import { Plus } from '@phosphor-icons/react/dist/ssr';
 import { DatabaseNotConfiguredError } from '@/lib/db/client';
 import { listOffers } from '@/lib/offers/service';
 import { COOKIE_NAME, parseMyCookie } from '@/lib/ownershipCookie';
@@ -63,10 +63,10 @@ export default async function ComparePage({
         </div>
         <Link
           href="/"
-          className="flex items-center gap-1.5 rounded-xl bg-ink-100 px-4 py-2.5 text-sm font-semibold text-base-950 transition hover:bg-white"
+          className="btn-volta-cta flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-medium text-white sm:px-4 sm:py-2 sm:text-sm active:scale-[0.98]"
         >
-          <Plus className="size-4" />
-          New analysis
+          <Plus className="size-3.5 sm:size-4 text-white" weight="light" />
+          <span>New analysis</span>
         </Link>
       </div>
 
