@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
-import { Bookmark } from 'lucide-react';
+import { BookmarkSimple } from '@phosphor-icons/react';
 
 export default function Navbar() {
   const [visible, setVisible] = useState(true);
@@ -41,10 +41,10 @@ export default function Navbar() {
         <Link
           href="/compare"
           aria-label="Saved offers"
-          className="flex items-center justify-center rounded-full bg-white px-3.5 py-1 text-xs font-semibold text-black shadow-sm transition hover:bg-neutral-100 sm:px-4 sm:py-1.5"
+          className="btn-volta-cta flex items-center justify-center rounded-full px-3.5 py-1 text-xs font-medium text-white sm:px-4 sm:py-1.5"
         >
           <span className="hidden sm:inline">Saved offers</span>
-          <Bookmark className="size-3.5 fill-black text-black sm:hidden" />
+          <BookmarkSimple className="size-3.5 text-white sm:hidden" weight="light" />
         </Link>
       </nav>
     </header>

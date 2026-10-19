@@ -1,23 +1,26 @@
 'use client';
 
-import { Building2, Sparkles, TriangleAlert, type LucideIcon } from 'lucide-react';
+import type { ComponentType } from 'react';
+import { RocketLaunch, Warning, Buildings, type IconProps } from '@phosphor-icons/react';
 import type { OfferInput } from '@/lib/engine/types';
 import { cn } from '@/lib/utils';
 import { PRESETS as PRESET_DATA, type PresetDefinition } from '@/lib/presets';
 
-const PRESET_ICONS: Record<string, LucideIcon> = {
-  'ideal-saas-mvp': Sparkles,
-  'scope-creep-trap': TriangleAlert,
-  'corporate-net90': Building2,
+type PhosphorIcon = ComponentType<IconProps>;
+
+const PRESET_ICONS: Record<string, PhosphorIcon> = {
+  'ideal-saas-mvp': RocketLaunch,
+  'scope-creep-trap': Warning,
+  'corporate-net90': Buildings,
 };
 
 export interface Preset extends PresetDefinition {
-  icon: LucideIcon;
+  icon: PhosphorIcon;
 }
 
 export const PRESETS: Preset[] = PRESET_DATA.map((p) => ({
   ...p,
-  icon: PRESET_ICONS[p.id] ?? Sparkles,
+  icon: PRESET_ICONS[p.id] ?? RocketLaunch,
 }));
 
 interface PresetChipsProps {
@@ -41,21 +44,19 @@ export default function PresetChips({ onApply, activeId, className }: PresetChip
             data-state={isActive ? 'active' : 'inactive'}
             onClick={() => onApply(preset.input, preset.id)}
             className={cn(
-              'glass rounded-xl px-3.5 py-3 text-left transition-all active:scale-[0.98]',
+              'glass flex items-center gap-2 rounded-xl px-3 py-2 text-left transition-all sm:px-3.5 sm:py-2.5 active:scale-[0.98]',
               isActive
                 ? 'border-ink-100/50 bg-white/[0.12] ring-1 ring-white/20'
                 : 'hover:border-white/25 hover:bg-white/[0.08]',
             )}
           >
-            <span className="flex items-center gap-2">
-              <Icon
-                className={cn('size-4 shrink-0 transition-colors', isActive ? 'text-ink-100' : 'text-ink-300')}
-              />
-              <span className={cn('text-sm font-medium', isActive ? 'text-white' : 'text-ink-100')}>
-                {preset.name}
-              </span>
+            <Icon
+              weight="light"
+              className={cn('size-4 shrink-0 transition-colors', isActive ? 'text-ink-100' : 'text-ink-300')}
+            />
+            <span className={cn('text-xs sm:text-sm font-medium leading-none', isActive ? 'text-white' : 'text-ink-100')}>
+              {preset.name}
             </span>
-            <span className="mt-1 block text-[11px] leading-snug text-ink-500">{preset.blurb}</span>
           </button>
         );
       })}

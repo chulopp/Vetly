@@ -1,6 +1,6 @@
 'use client';
 
-import { Zap } from 'lucide-react';
+import { Lightning } from '@phosphor-icons/react';
 
 interface HeroProps {
   onStartAnalyzing?: () => void;
@@ -10,23 +10,23 @@ interface HeroProps {
 /**
  * Hero section styled with 99% fidelity to Volta (volta.net):
  * - Optically centered in viewport (min-h-[85vh])
- * - Pill badge: charcoal #181b22, neutral gray text, gray arrow
+ * - Pill badge: charcoal #181b22, crisp white text
  * - 2-tier bold headline without period ("Know your / real hourly rate")
  * - Balanced 2-line subheadline without em-dashes
- * - Slim metallic CTA button ("Start analyzing") with left Zap icon
+ * - Slim metallic CTA button ("Start analyzing") with left Lightning icon
  * - Bilateral tiered horizontal lines on left and right, head crisp near button, tail blurred outwards
  */
 export default function Hero({ onStartAnalyzing, cardExpanded }: HeroProps) {
   return (
     <section className="flex min-h-[85vh] flex-col items-center justify-center pt-20 pb-8 text-center">
-      {/* Pill Badge - charcoal, gray text, gray arrow */}
+      {/* Pill Badge - charcoal, crisp white text */}
       <button
         type="button"
         onClick={onStartAnalyzing}
-        className="inline-flex items-center gap-1.5 rounded-full border border-white/12 bg-[#181b22] px-3.5 py-1 text-xs font-medium text-neutral-400 shadow-sm transition-colors hover:border-white/25 hover:text-neutral-300"
+        className="inline-flex items-center gap-1.5 rounded-full border border-white/12 bg-[#181b22] px-3.5 py-1 text-xs font-medium text-white shadow-sm transition-colors hover:border-white/25"
       >
         <span>Introducing Vetly 1.0</span>
-        <span className="text-neutral-500">→</span>
+        <span className="text-white/80">→</span>
       </button>
 
       {/* 2-tier bold headline with Volta tight tracking - NO period */}
@@ -60,7 +60,7 @@ export default function Hero({ onStartAnalyzing, cardExpanded }: HeroProps) {
             aria-controls="analyze"
             className="btn-volta-cta relative z-10 flex items-center gap-2 rounded-full px-4 py-1.5 text-xs font-medium text-white sm:px-5 sm:py-2 sm:text-sm active:scale-[0.98]"
           >
-            <Zap className="size-3.5 text-white sm:size-4" />
+            <Lightning className="size-3.5 text-white sm:size-4" weight="light" />
             <span>Start analyzing</span>
           </button>
 

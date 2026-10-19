@@ -16,6 +16,7 @@
   },
   "dependencies": {
     "@neondatabase/serverless": "^0.10.4",
+    "@phosphor-icons/react": "^2.1.10",
     "drizzle-orm": "^0.44.7",
     "lucide-react": "^1.57.0",
     "nanoid": "^5.1.5",

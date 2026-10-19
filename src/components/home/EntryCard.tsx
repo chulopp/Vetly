@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { ChevronDown } from 'lucide-react';
+import { CaretDown } from '@phosphor-icons/react';
 import LiveRiskGauge from '@/components/home/LiveRiskGauge';
 import OfferForm from '@/components/home/OfferForm';
 import PresetChips from '@/components/home/PresetChips';
@@ -359,7 +359,7 @@ export default function EntryCard({ expanded, onExpand }: EntryCardProps = {}) {
           className="mt-5 flex items-center gap-1.5 text-sm font-medium text-ink-300 transition-colors hover:text-ink-100"
         >
           Or enter manually
-          <ChevronDown className={cn('size-4 transition-transform duration-300', formOpen && 'rotate-180')} />
+          <CaretDown className={cn('size-4 transition-transform duration-300', formOpen && 'rotate-180')} weight="light" />
         </button>
 
         {formOpen && (

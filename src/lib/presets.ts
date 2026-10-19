@@ -11,8 +11,8 @@ export interface PresetDefinition {
 export const PRESETS: PresetDefinition[] = [
   {
     id: 'ideal-saas-mvp',
-    name: 'Ideal SaaS MVP',
-    blurb: 'Fair margin, zero risk — an easy accept.',
+    name: 'SaaS MVP Project',
+    blurb: '',
     input: {
       budget: 8000,
       currency: 'USD',
@@ -27,8 +27,8 @@ export const PRESETS: PresetDefinition[] = [
   },
   {
     id: 'scope-creep-trap',
-    name: 'Scope Creep Trap',
-    blurb: 'Deep deficit, every red flag — reject fast.',
+    name: 'High-Risk Fixed Scope',
+    blurb: '',
     input: {
       budget: 1500,
       currency: 'USD',
@@ -43,8 +43,8 @@ export const PRESETS: PresetDefinition[] = [
   },
   {
     id: 'corporate-net90',
-    name: 'High-Pay Corporate Net-90',
-    blurb: 'Great rate, risky terms — negotiate.',
+    name: 'Enterprise Net-90',
+    blurb: '',
     input: {
       budget: 18000,
       currency: 'USD',
