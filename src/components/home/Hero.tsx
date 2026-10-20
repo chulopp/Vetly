@@ -19,14 +19,18 @@ interface HeroProps {
 export default function Hero({ onStartAnalyzing, cardExpanded }: HeroProps) {
   return (
     <section className="flex min-h-[85vh] flex-col items-center justify-center pt-20 pb-8 text-center">
-      {/* Pill Badge - charcoal, crisp white text */}
+      {/* Pill Badge - charcoal, crisp white text with periodic shimmer sweep */}
       <button
         type="button"
         onClick={onStartAnalyzing}
-        className="inline-flex items-center gap-1.5 rounded-full border border-white/12 bg-[#181b22] px-3.5 py-1 text-xs font-medium text-white shadow-sm transition-colors hover:border-white/25"
+        className="relative inline-flex items-center gap-1.5 overflow-hidden rounded-full border border-white/12 bg-[#181b22] px-3.5 py-1 text-xs font-medium text-white shadow-sm transition-colors hover:border-white/25"
       >
-        <span>Introducing Vetly 1.0</span>
-        <span className="text-white/80">→</span>
+        <div
+          className="animate-pill-shimmer pointer-events-none absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent"
+          aria-hidden="true"
+        />
+        <span className="relative z-10">Introducing Vetly 1.0</span>
+        <span className="relative z-10 text-white/80">→</span>
       </button>
 
       {/* 2-tier bold headline with Volta tight tracking - NO period */}
@@ -39,17 +43,14 @@ export default function Hero({ onStartAnalyzing, cardExpanded }: HeroProps) {
         Calculate your real take-home rate after fees and scope creep, score client risk automatically, and get a ready-to-send counter-offer in seconds for any project.
       </p>
 
-      {/* Volta-style CTA with bilateral tiered lines */}
+      {/* Volta-style CTA with asymmetric horizontal lines */}
       <div className="relative mx-auto mt-8 flex items-center justify-center">
         <div className="relative inline-flex items-center">
-          {/* Left-side tiered lines: head near button (right), tail blurred outwards (left) */}
+          {/* Left-side line: 1 lower line extending to the left, head crisp near button */}
           <div
-            className="pointer-events-none absolute right-full mr-3 hidden flex-col items-end sm:flex"
+            className="pointer-events-none absolute right-full mr-3 hidden sm:flex"
             aria-hidden="true"
           >
-            {/* Upper line: shorter, head crisp near button, blurred tail on left */}
-            <div className="-mt-1 h-px w-20 bg-gradient-to-l from-white/35 via-white/15 to-transparent blur-[0.2px]" />
-            {/* Lower line: slightly longer, offset lower and further left */}
             <div className="mt-5 h-px w-28 -translate-x-2 bg-gradient-to-l from-white/25 via-white/10 to-transparent blur-[0.2px]" />
           </div>
 
@@ -60,19 +61,16 @@ export default function Hero({ onStartAnalyzing, cardExpanded }: HeroProps) {
             aria-controls="analyze"
             className="btn-volta-cta relative z-10 flex items-center gap-2 rounded-full px-4 py-1.5 text-xs font-medium text-white sm:px-5 sm:py-2 sm:text-sm active:scale-[0.98]"
           >
-            <Lightning className="size-3.5 text-white sm:size-4" weight="light" />
+            <Lightning className="animate-lightning-pulse size-3.5 text-white sm:size-4" weight="light" />
             <span>Start analyzing</span>
           </button>
 
-          {/* Right-side tiered lines: head near button (left), tail blurred outwards (right) */}
+          {/* Right-side line: 1 upper line extending to the right, head crisp near button */}
           <div
-            className="pointer-events-none absolute left-full ml-3 hidden flex-col sm:flex"
+            className="pointer-events-none absolute left-full ml-3 hidden sm:flex"
             aria-hidden="true"
           >
-            {/* Upper line: shorter, head crisp near button, blurred tail on right */}
             <div className="-mt-1 h-px w-20 bg-gradient-to-r from-white/35 via-white/15 to-transparent blur-[0.2px]" />
-            {/* Lower line: slightly longer, offset lower and further right */}
-            <div className="mt-5 h-px w-28 translate-x-2 bg-gradient-to-r from-white/25 via-white/10 to-transparent blur-[0.2px]" />
           </div>
         </div>
       </div>
