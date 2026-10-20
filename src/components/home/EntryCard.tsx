@@ -243,29 +243,29 @@ export default function EntryCard({ expanded, onExpand }: EntryCardProps = {}) {
         });
         const missingNote =
           stillEmpty.length > 0
-            ? ` — ${FIELD_LABELS[stillEmpty[0] as FormFieldKey]}${stillEmpty.length > 1 ? ` and ${stillEmpty.length - 1} other field${stillEmpty.length > 2 ? 's' : ''}` : ''} still need${stillEmpty.length === 1 ? 's' : ''} your input.`
+            ? ` ${FIELD_LABELS[stillEmpty[0] as FormFieldKey]}${stillEmpty.length > 1 ? ` and ${stillEmpty.length - 1} other field${stillEmpty.length > 2 ? 's' : ''}` : ''} still need${stillEmpty.length === 1 ? 's' : ''} your input.`
             : '';
 
         setPaste(
           resolved > 0
             ? {
                 status: 'success',
-                message: `Extracted ${resolved} of 8 fields — review and adjust below, then analyze.${missingNote}`,
+                message: `Extracted ${resolved} of 8 fields. Review and adjust below, then analyze.${missingNote}`,
               }
-            : { status: 'error', message: 'No offer details found in that message — fill the form manually.' },
+            : { status: 'error', message: 'No offer details found in that message. Fill the form manually.' },
         );
       } else {
         // graceful fallback: manual entry, never blocks the core flow (PRD §3.3)
         setFormOpen(true);
         setInternalExpanded(true);
         if (onExpand) onExpand();
-        setPaste({ status: 'error', message: "Couldn't extract from that message — fill the form manually." });
+        setPaste({ status: 'error', message: "Couldn't extract from that message. Fill the form manually." });
       }
     } catch {
       setFormOpen(true);
       setInternalExpanded(true);
       if (onExpand) onExpand();
-      setPaste({ status: 'error', message: "Couldn't extract — check your connection and fill the form manually." });
+      setPaste({ status: 'error', message: "Couldn't extract. Check your connection and fill the form manually." });
     }
   }
 
@@ -332,7 +332,7 @@ export default function EntryCard({ expanded, onExpand }: EntryCardProps = {}) {
       }
       setSubmitting(false);
     } catch {
-      setSubmitError('Could not reach the server — check your connection and try again.');
+      setSubmitError('Could not reach the server. Check your connection and try again.');
       setSubmitting(false);
     }
   }
