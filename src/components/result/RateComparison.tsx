@@ -18,7 +18,7 @@ export default function RateComparison({ offer }: { offer: OfferRecord }) {
   return (
     <div className="flex flex-col gap-4">
       <div className="grid gap-4 sm:grid-cols-2">
-        <div className="solid-panel rounded-2xl p-5">
+        <div className="glass rounded-2xl p-5">
           <div className="text-[11px] font-medium uppercase tracking-[0.14em] text-ink-500">
             Effective hourly rate
           </div>
@@ -27,7 +27,7 @@ export default function RateComparison({ offer }: { offer: OfferRecord }) {
           </div>
           <div className="mt-1 text-[11px] text-ink-500">what this deal really pays, per hour</div>
         </div>
-        <div className="solid-panel rounded-2xl p-5">
+        <div className="glass rounded-2xl p-5">
           <div className="text-[11px] font-medium uppercase tracking-[0.14em] text-ink-500">
             Your target rate
           </div>
@@ -38,7 +38,9 @@ export default function RateComparison({ offer }: { offer: OfferRecord }) {
 
       <div className="glass rounded-2xl p-5">
         <div className="flex flex-wrap items-baseline justify-between gap-2">
-          <span className="text-sm text-ink-300">Profitability margin</span>
+          <div className="text-[11px] font-medium uppercase tracking-[0.14em] text-ink-500">
+            Profitability margin
+          </div>
           <span
             className={cn('text-2xl font-semibold tnum', margin >= 0 ? 'text-accept' : 'text-reject')}
           >

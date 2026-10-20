@@ -28,7 +28,7 @@ export default function RiskBreakdown({ analysis }: { analysis: AnalysisResult }
           >
             <span className="text-sm">
               <span className="font-medium text-ink-100">{contribution.label}</span>{' '}
-              <span className="text-xs text-ink-500">— {contribution.detail}</span>
+              <span className="text-xs text-ink-500">({contribution.detail})</span>
             </span>
             <span
               className={cn(

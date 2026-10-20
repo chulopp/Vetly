@@ -25,6 +25,7 @@ export default function RootLayout({
   return (
     <html lang="en" className={inter.variable}>
       <body className="flex min-h-dvh flex-col font-sans text-ink-100 antialiased">
+        <div className="bg-aurora-fixed" aria-hidden="true" />
         <Navbar />
         <div className="flex-1">
           {children}

@@ -15,18 +15,18 @@ export default function CounterOfferCard({
   currency: string;
 }) {
   return (
-    <div className="glass-strong animate-fade-up rounded-2xl p-5">
-      <div className="text-[11px] font-medium uppercase tracking-[0.14em] text-negotiate">
+    <div className="glass animate-fade-up rounded-2xl p-5">
+      <div className="text-[11px] font-medium uppercase tracking-[0.14em] text-ink-500">
         Your counter-offer
       </div>
       <p className="mt-1.5 text-xs leading-relaxed text-ink-500">
-        A reasonable number to counter with — a starting point for negotiation, not a guarantee the
+        A reasonable number to counter with. A starting point for negotiation, not a guarantee the
         client will accept it.
       </p>
 
       <div className="mt-4 space-y-3">
         {counterOffer.suggestedBudget != null && (
-          <div className="solid-panel rounded-xl p-4">
+          <div className="rounded-xl border border-white/10 bg-white/[0.03] p-4">
             <div className="text-xs text-ink-500">Ask for a budget of</div>
             <div className="mt-1 text-2xl font-semibold tnum text-ink-100">
               {formatMoney(counterOffer.suggestedBudget, currency)}
@@ -39,7 +39,7 @@ export default function CounterOfferCard({
         )}
 
         {counterOffer.maxExecutableHours != null && (
-          <div className="solid-panel rounded-xl p-4">
+          <div className="rounded-xl border border-white/10 bg-white/[0.03] p-4">
             <div className="text-xs text-ink-500">Or cap the work at</div>
             <div className="mt-1 text-2xl font-semibold tnum text-ink-100">
               {counterOffer.maxExecutableHours}

@@ -64,50 +64,47 @@ export default function DraftMessage({ offerId }: { offerId: string }) {
         type="button"
         onClick={handleDraft}
         disabled={status === 'loading'}
-        className="mt-3 flex w-full items-center justify-center gap-2 rounded-xl border border-negotiate/40 bg-negotiate/10 px-4 py-2.5 text-sm font-semibold text-negotiate transition hover:bg-negotiate/20 disabled:cursor-wait disabled:opacity-60"
+        className="btn-volta-cta mt-3 flex w-full items-center justify-center gap-2 rounded-full py-2.5 text-sm font-medium text-white transition active:scale-[0.98] disabled:cursor-wait disabled:opacity-60"
       >
         {status === 'loading' ? (
           <>
-            <Spinner className="size-3.5" />
-            Drafting…
+            <Spinner className="size-3.5 text-white" />
+            <span>Drafting…</span>
           </>
         ) : (
           <>
-            <Sparkles className="size-4" />
-            Draft a negotiation message
+            <Sparkles className="size-4 text-white" />
+            <span>Draft a negotiation message</span>
           </>
         )}
       </button>
 
       {status === 'error' && (
         <p className="mt-2.5 text-xs text-ink-500">
-          Couldn&apos;t draft a message — your counter-offer numbers above are all you need.
+          Couldn&apos;t draft a message. Your counter-offer numbers above are all you need.
         </p>
       )}
 
       {status === 'done' && message && (
-        <div className="mt-3.5 animate-fade-up">
-          <div className="whitespace-pre-wrap rounded-xl border border-white/10 bg-white/[0.04] p-4 text-sm leading-relaxed text-ink-100">
+        <div className="relative mt-3.5 animate-fade-up">
+          <div className="whitespace-pre-wrap rounded-xl border border-white/10 bg-white/[0.04] p-4 pr-12 text-sm leading-relaxed text-ink-100">
             {message}
           </div>
           <button
             type="button"
             onClick={handleCopy}
-            className={cn(
-              'mt-2.5 flex items-center gap-1.5 rounded-full border border-white/15 bg-white/[0.03] px-3.5 py-1.5 text-xs font-medium text-ink-300 transition hover:border-white/30 hover:text-ink-100',
-            )}
+            aria-label={copied ? 'Copied' : 'Copy message'}
+            title={copied ? 'Copied!' : 'Copy message'}
+            className="group absolute top-3 right-3 flex items-center justify-center rounded-lg border border-white/10 bg-white/[0.05] p-2 text-ink-300 transition hover:border-white/25 hover:bg-white/10 hover:text-white active:scale-95"
           >
             {copied ? (
-              <>
-                <Check className="size-3.5 text-accept" />
-                Copied
-              </>
+              <Check className="size-3.5 text-accept" />
             ) : (
-              <>
-                <Copy className="size-3.5" />
-                Copy message
-              </>
+              <Copy className="size-3.5" />
             )}
+            <span className="pointer-events-none absolute -top-8 right-0 z-20 rounded bg-base-950/90 px-1.5 py-0.5 text-[10px] font-medium text-ink-100 opacity-0 shadow-md backdrop-blur transition-opacity group-hover:opacity-100">
+              {copied ? 'Copied!' : 'Copy'}
+            </span>
           </button>
         </div>
       )}
