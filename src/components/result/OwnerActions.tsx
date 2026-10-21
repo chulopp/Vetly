@@ -73,7 +73,7 @@ export default function OwnerActions({ offerId, isOwner }: OwnerActionsProps) {
           className="mt-3.5 inline-flex items-center gap-2 rounded-xl bg-ink-100 px-5 py-2.5 text-sm font-semibold text-base-950 transition hover:bg-white"
         >
           <Plus className="size-4" />
-          Analyze your own deal
+          Analyze a deal
         </Link>
       </div>
     );

@@ -363,18 +363,16 @@ export default function EntryCard({ expanded, onExpand }: EntryCardProps = {}) {
         </button>
 
         {formOpen && (
-          <div
+          <form
+            id="offer-form"
+            onSubmit={handleSubmit}
+            noValidate
             className={cn(
               'mt-5 grid items-start gap-6',
               gaugeVisible && 'lg:grid-cols-[minmax(0,1fr)_280px]',
             )}
           >
-            <form
-              id="offer-form"
-              onSubmit={handleSubmit}
-              noValidate
-              className="grid grid-cols-1 gap-4 sm:grid-cols-2"
-            >
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <OfferForm
                 key={`${activePresetId ?? 'manual'}-${presetRevision}`}
                 form={form}
@@ -383,7 +381,7 @@ export default function EntryCard({ expanded, onExpand }: EntryCardProps = {}) {
                 onFieldBlur={handleFieldBlur}
                 onFlagToggle={handleFlagToggle}
               />
-            </form>
+            </div>
 
             {riskView && (
               <aside className="animate-fade-up lg:sticky lg:top-24 lg:self-start">
@@ -391,9 +389,8 @@ export default function EntryCard({ expanded, onExpand }: EntryCardProps = {}) {
               </aside>
             )}
 
-            <div className="animate-fade-up">
+            <div className={cn('animate-fade-up', gaugeVisible && 'lg:col-span-2')}>
               <button
-                form="offer-form"
                 type="submit"
                 disabled={submitting}
                 className="btn-volta-cta flex w-full items-center justify-center gap-2 rounded-xl px-5 py-3 text-sm font-semibold text-white transition active:scale-[0.98] disabled:cursor-wait disabled:opacity-60"
@@ -409,7 +406,7 @@ export default function EntryCard({ expanded, onExpand }: EntryCardProps = {}) {
               </button>
               {submitError && <p className="mt-2 text-xs text-reject">{submitError}</p>}
             </div>
-          </div>
+          </form>
         )}
       </div>
     </section>

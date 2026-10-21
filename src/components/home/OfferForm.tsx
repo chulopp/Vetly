@@ -96,23 +96,27 @@ export default function OfferForm({ form, errors, onFieldChange, onFieldBlur, on
           {FLAG_OPTIONS.map((option) => {
             const active = form.flags.includes(option.flag);
             return (
-              <button
+              <label
                 key={option.flag}
-                type="button"
-                name={option.flag}
                 data-testid={`flag-${option.flag}`}
-                aria-pressed={active}
                 title={option.hint}
-                onClick={() => onFlagToggle(option.flag)}
                 className={cn(
-                  'rounded-full border px-3.5 py-1.5 text-sm transition-all active:scale-[0.97]',
+                  'cursor-pointer select-none rounded-full border px-3.5 py-1.5 text-sm transition-all active:scale-[0.97]',
                   active
                     ? 'border-reject/50 bg-reject/15 text-reject'
                     : 'border-white/15 bg-white/[0.03] text-ink-300 hover:border-white/30 hover:text-ink-100',
                 )}
               >
-                {option.label}
-              </button>
+                <input
+                  type="checkbox"
+                  name={option.flag}
+                  id={`flag-${option.flag}`}
+                  checked={active}
+                  onChange={() => onFlagToggle(option.flag)}
+                  className="sr-only"
+                />
+                <span>{option.label}</span>
+              </label>
             );
           })}
         </div>
