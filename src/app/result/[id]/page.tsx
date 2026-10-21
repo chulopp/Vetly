@@ -15,6 +15,7 @@ import { getOffer, type OfferRecord } from '@/lib/offers/service';
 import { findPreset } from '@/lib/presets';
 import { OFFER_ID_PATTERN } from '@/lib/validation/offer';
 import { cookieOwnsOffer, COOKIE_NAME } from '@/lib/ownershipCookie';
+import { generateVerdictSummary } from '@/lib/summary';
 
 async function loadOffer(id: string): Promise<{ offer: OfferRecord | null; dbError: boolean }> {
   try {
@@ -105,7 +106,10 @@ export default async function ResultPage({
       <div className="grid gap-6 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">
         {/* left column - the narrative: why this verdict */}
         <div className="flex min-w-0 flex-col gap-6">
-          <DecisionBadge action={analysis.recommendAction} reason={analysis.decisionReason} />
+          <DecisionBadge
+            action={analysis.recommendAction}
+            summary={generateVerdictSummary(offer)}
+          />
           <RateComparison offer={offer} />
           <RiskBreakdown analysis={analysis} />
         </div>
