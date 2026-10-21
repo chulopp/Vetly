@@ -17,8 +17,11 @@ export default function HomePage() {
   function handleStart() {
     setExpanded(true);
     setTimeout(() => {
-      document.getElementById('analyze')?.scrollIntoView({ behavior: 'smooth' });
-    }, 50);
+      window.scrollTo({
+        top: document.documentElement.scrollHeight,
+        behavior: 'smooth',
+      });
+    }, 80);
   }
 
   return (

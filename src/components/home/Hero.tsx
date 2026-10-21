@@ -59,10 +59,15 @@ export default function Hero({ onStartAnalyzing, cardExpanded }: HeroProps) {
             onClick={onStartAnalyzing}
             aria-expanded={cardExpanded}
             aria-controls="analyze"
-            className="btn-volta-cta relative z-10 flex items-center gap-2 rounded-full px-4 py-1.5 text-xs font-medium text-white sm:px-5 sm:py-2 sm:text-sm active:scale-[0.98]"
+            className="btn-volta-cta relative z-10 flex items-center gap-2 overflow-hidden rounded-full px-4 py-1.5 text-xs font-medium text-white sm:px-5 sm:py-2 sm:text-sm active:scale-[0.98]"
           >
-            <Lightning className="animate-lightning-pulse size-3.5 text-white sm:size-4" weight="light" />
-            <span>Start analyzing</span>
+            {/* Slow full-button light slide shimmer sweep */}
+            <div
+              className="pointer-events-none absolute inset-0 -translate-x-full animate-btn-shimmer bg-gradient-to-r from-transparent via-white/[0.22] to-transparent"
+              aria-hidden="true"
+            />
+            <Lightning className="size-3.5 text-white sm:size-4" weight="light" />
+            <span className="relative z-10">Start analyzing</span>
           </button>
 
           {/* Right-side line: 1 upper line extending to the right, head crisp near button */}

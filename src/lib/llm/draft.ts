@@ -27,18 +27,19 @@ export async function draftNegotiationMessage(offer: OfferRecord): Promise<Draft
     'You draft short, polite, and direct business negotiation emails in English for freelance professionals. ' +
     'The numbers in the user message are fixed by an analysis tool — quote them exactly, never change, round, or invent numbers. ' +
     'Keep the email between roughly 120 and 180 words, no subject line, ready to send as-is. ' +
+    'Do NOT use long dash lines (em-dash "—" or en-dash "–") anywhere in your message; use commas, periods, or standard hyphens instead. ' +
     'Respond ONLY with a JSON object: {"message": "<the full email text>"}';
 
   const lines = [
     'Draft my counter-offer email for a freelance project.',
     `Currency: ${offer.input.currency}`,
     `Their current offer: a total budget of ${money(offer.input.budget)} for about ${offer.input.estimatedHours} hours of work.`,
-    `My target hourly rate is ${money(offer.input.targetRate)} — the offer as-is works out to ${money(offer.analysis.effectiveHourlyRate)} per hour (${offer.analysis.profitabilityMargin}% versus my target).`,
+    `My target hourly rate is ${money(offer.input.targetRate)}, the offer as-is works out to ${money(offer.analysis.effectiveHourlyRate)} per hour (${offer.analysis.profitabilityMargin}% versus my target).`,
   ];
 
   if (counter.budgetTriggered && counter.suggestedBudget != null) {
     lines.push(
-      `I am countering with a total budget of ${money(counter.suggestedBudget)} — phrase this naturally, but this exact total is the minimum number I can accept.`,
+      `I am countering with a total budget of ${money(counter.suggestedBudget)}, phrase this naturally, but this exact total is the minimum number I can accept.`,
     );
   }
   if (counter.budgetTriggered && counter.maxExecutableHours != null && counter.maxExecutableHours > 0) {
@@ -63,7 +64,8 @@ export async function draftNegotiationMessage(offer: OfferRecord): Promise<Draft
   }
   const message = (raw as { message?: unknown }).message;
   if (typeof message === 'string' && message.trim().length > 0) {
-    return { ok: true, message: message.trim(), error: null };
+    const sanitized = message.trim().replace(/\s*[—–]\s*/g, ', ');
+    return { ok: true, message: sanitized, error: null };
   }
   return { ok: false, message: null, error: 'llm_invalid_response' };
 }

@@ -347,7 +347,7 @@ export default function EntryCard({ expanded, onExpand }: EntryCardProps = {}) {
           : 'my-6 max-h-[3500px] opacity-100 animate-fade-up',
       )}
     >
-      <div className="card-volta p-5 md:p-7">
+      <div className="glass rounded-[26px] p-5 md:p-7">
         <SmartPasteBox status={paste.status} message={paste.message} onExtract={handleExtract} />
 
         <PresetChips className="mt-5" onApply={applyPreset} activeId={activePresetId} />

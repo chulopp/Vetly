@@ -211,7 +211,7 @@ export default function DecisionBadge({ action, summary, offer }: DecisionBadgeP
               onClick={handleCopyResult}
               aria-label={copied ? 'Result copied' : 'Copy result'}
               title={copied ? 'Copied to clipboard!' : 'Copy full result to clipboard'}
-              className="flex items-center gap-1.5 rounded-xl border border-white/15 bg-white/[0.04] px-3 py-1.5 text-xs font-medium text-ink-300 transition-all hover:border-white/30 hover:bg-white/10 hover:text-white active:scale-95"
+              className="flex items-center gap-1.5 rounded-xl px-2 py-1 text-xs font-medium text-ink-300 transition-colors hover:bg-white/[0.08] hover:text-white active:scale-95"
             >
               {copied ? (
                 <Check className="size-3.5 text-accept" />

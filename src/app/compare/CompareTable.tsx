@@ -175,10 +175,10 @@ export function CompareTable({ initialOffers = [] }: { initialOffers?: OfferReco
                   >
                     {formatMargin(offer.analysis.profitabilityMargin)}%
                   </td>
-                  <td className="px-4 py-3.5">
+                  <td className="px-4 py-3.5 whitespace-nowrap">
                     <TierBadge tier={offer.analysis.riskTier} />
                   </td>
-                  <td className="px-4 py-3.5">
+                  <td className="px-4 py-3.5 whitespace-nowrap">
                     <ActionBadge action={offer.analysis.recommendAction} />
                   </td>
                 </tr>

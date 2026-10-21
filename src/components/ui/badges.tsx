@@ -17,7 +17,7 @@ export function TierBadge({ tier }: { tier: RiskTier }) {
   return (
     <span
       className={cn(
-        'inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold tracking-wide',
+        'inline-flex items-center whitespace-nowrap rounded-full border px-2.5 py-0.5 text-xs font-semibold tracking-wide',
         TIER_STYLES[tier],
       )}
     >
@@ -30,7 +30,7 @@ export function ActionBadge({ action }: { action: RecommendAction }) {
   return (
     <span
       className={cn(
-        'inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold tracking-wide',
+        'inline-flex items-center whitespace-nowrap rounded-full border px-2.5 py-0.5 text-xs font-semibold tracking-wide',
         ACTION_STYLES[action],
       )}
     >

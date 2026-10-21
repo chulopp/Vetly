@@ -189,38 +189,24 @@ body {
 }
 
 /* Electric lightning pulse on CTA button icon */
-@keyframes lightning-flash {
-  0%, 78%, 100% {
-    filter: drop-shadow(0 0 0 rgba(61, 220, 132, 0));
-    transform: scale(1);
-    color: #ffffff;
+@keyframes btn-shimmer-sweep {
+  0%, 20% {
+    transform: translateX(-100%);
   }
-  84% {
-    filter: drop-shadow(0 0 8px rgba(61, 220, 132, 0.95));
-    transform: scale(1.18);
-    color: #3ddc84;
-  }
-  89% {
-    filter: drop-shadow(0 0 4px rgba(255, 255, 255, 0.9));
-    transform: scale(1.08);
-    color: #ffffff;
-  }
-  94% {
-    filter: drop-shadow(0 0 6px rgba(61, 220, 132, 0.8));
-    transform: scale(1.14);
-    color: #3ddc84;
+  70%, 100% {
+    transform: translateX(100%);
   }
 }
 
-.animate-lightning-pulse {
-  animation: lightning-flash 4.5s ease-in-out infinite;
+.animate-btn-shimmer {
+  animation: btn-shimmer-sweep 5.5s cubic-bezier(0.4, 0, 0.2, 1) infinite;
 }
 
 @media (prefers-reduced-motion: reduce) {
   .animate-fade-up,
   .animate-reveal-badge,
   .animate-pill-shimmer,
-  .animate-lightning-pulse {
+  .animate-btn-shimmer {
     animation: none;
   }
 }
