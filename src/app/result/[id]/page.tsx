@@ -103,9 +103,9 @@ export default async function ResultPage({
 
   return (
     <main className="mx-auto w-full max-w-5xl px-4 pb-16 pt-24">
-      <div className="grid gap-6 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">
-        {/* left column - the narrative: why this verdict */}
-        <div className="flex min-w-0 flex-col gap-6">
+      <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">
+        {/* left column - the narrative: sticky alongside long right column */}
+        <div className="flex min-w-0 flex-col gap-6 lg:sticky lg:top-24 lg:self-start">
           <DecisionBadge
             action={analysis.recommendAction}
             summary={generateVerdictSummary(offer)}
@@ -115,8 +115,8 @@ export default async function ResultPage({
           <RiskBreakdown analysis={analysis} />
         </div>
 
-        {/* right column - the action: what to do about it */}
-        <div className="flex min-w-0 flex-col gap-6 lg:sticky lg:top-24 lg:self-start">
+        {/* right column - the action: scrolls naturally */}
+        <div className="flex min-w-0 flex-col gap-6">
           {analysis.counterOffer?.budgetTriggered && (
             <CounterOfferCard counterOffer={analysis.counterOffer} currency={offer.input.currency} />
           )}
