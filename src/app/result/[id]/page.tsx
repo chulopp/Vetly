@@ -118,7 +118,9 @@ export default async function ResultPage({
           {analysis.counterOffer?.riskTriggered && (
             <ContractConditions counterOffer={analysis.counterOffer} />
           )}
-          {analysis.counterOffer && <DraftMessage offerId={offer.id} />}
+          {analysis.counterOffer && (
+            <DraftMessage offerId={offer.id} initialDraft={offer.draftMessage} />
+          )}
           <OwnerActions offerId={offer.id} isOwner={isOwner} />
         </div>
       </div>
@@ -132,7 +134,7 @@ function DbUnavailableCard() {
       <div className="glass animate-fade-up rounded-3xl p-10">
         <h1 className="text-xl font-semibold text-ink-100">Saved offers aren&apos;t available right now.</h1>
         <p className="mt-2 text-sm leading-relaxed text-ink-300">
-          The analysis database isn&apos;t configured yet — try again in a moment.
+          The analysis database isn&apos;t configured yet, try again in a moment.
         </p>
         <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
           <Link

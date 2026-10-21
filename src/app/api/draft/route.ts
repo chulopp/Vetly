@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { DatabaseNotConfiguredError } from '@/lib/db/client';
 import { draftNegotiationMessage } from '@/lib/llm/draft';
-import { getOffer } from '@/lib/offers/service';
+import { getOffer, saveDraftMessage } from '@/lib/offers/service';
 import { OFFER_ID_PATTERN, zodToIssues } from '@/lib/validation/offer';
 
 const DraftRequestSchema = z.object({
@@ -47,12 +47,22 @@ export async function POST(request: Request) {
         { status: 400 },
       );
     }
+    if (offer.draftMessage) {
+      return NextResponse.json({ ok: true, message: offer.draftMessage });
+    }
     const outcome = await draftNegotiationMessage(offer); // never throws
+    if (outcome.ok && outcome.message) {
+      try {
+        await saveDraftMessage(offer.id, outcome.message);
+      } catch (saveError) {
+        console.error('[POST /api/draft] failed to persist draft message:', saveError);
+      }
+    }
     return NextResponse.json(outcome);
   } catch (error) {
     if (error instanceof DatabaseNotConfiguredError) {
       return NextResponse.json(
-        { error: 'DATABASE_NOT_CONFIGURED', message: 'Saved offers are unavailable — DATABASE_URL is not set.' },
+        { error: 'DATABASE_NOT_CONFIGURED', message: 'Saved offers are unavailable, DATABASE_URL is not set.' },
         { status: 503 },
       );
     }
