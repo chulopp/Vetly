@@ -1,7 +1,9 @@
+import { Suspense } from 'react';
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
+import TopLoader from '@/components/layout/TopLoader';
 import './globals.css';
 
 const inter = Inter({
@@ -25,6 +27,9 @@ export default function RootLayout({
   return (
     <html lang="en" className={inter.variable}>
       <body className="flex min-h-dvh flex-col font-sans text-ink-100 antialiased">
+        <Suspense fallback={null}>
+          <TopLoader />
+        </Suspense>
         <div className="bg-aurora-fixed" aria-hidden="true" />
         <Navbar />
         <div className="flex-1">
