@@ -61,8 +61,7 @@ export default function RateComparison({ offer }: { offer: OfferRecord }) {
       <div className="mt-5 grid gap-4 sm:grid-cols-2">
         {/* Effective Rate */}
         <div className="rounded-xl border border-white/5 bg-white/[0.025] p-4 transition-colors hover:border-white/10">
-          <div className="flex items-center gap-1.5 text-xs font-medium text-ink-400">
-            <span className="size-2 rounded-full bg-ink-200" />
+          <div className="text-xs font-medium text-ink-400">
             Effective hourly rate
           </div>
           <div className="mt-2 text-2xl font-bold tracking-tight text-ink-100 sm:text-3xl tnum">
@@ -73,11 +72,10 @@ export default function RateComparison({ offer }: { offer: OfferRecord }) {
 
         {/* Target Rate */}
         <div className="rounded-xl border border-white/5 bg-white/[0.025] p-4 transition-colors hover:border-white/10">
-          <div className="flex items-center gap-1.5 text-xs font-medium text-ink-400">
-            <span className="size-2 rounded-full border border-white/40 bg-transparent" />
+          <div className="text-xs font-medium text-ink-400">
             Your target rate
           </div>
-          <div className="mt-2 text-2xl font-bold tracking-tight text-ink-300 sm:text-3xl tnum">
+          <div className="mt-2 text-2xl font-bold tracking-tight text-ink-100 sm:text-3xl tnum">
             {money(targetRate)}
           </div>
           <div className="mt-1 text-[11px] text-ink-500">what you need to earn, per hour</div>
