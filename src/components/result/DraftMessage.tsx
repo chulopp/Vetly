@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { Check, Copy, Sparkles } from 'lucide-react';
+import { Spinner } from '@/components/ui/Spinner';
 import { cn } from '@/lib/utils';
 
 type DraftStatus = 'idle' | 'loading' | 'done' | 'error';
@@ -73,7 +74,7 @@ export default function DraftMessage({ offerId, initialDraft }: DraftMessageProp
         >
           {status === 'loading' ? (
             <>
-              <Sparkles className="size-4 animate-pulse text-amber-300" />
+              <Spinner className="size-4 text-white" />
               <span>Drafting…</span>
             </>
           ) : (

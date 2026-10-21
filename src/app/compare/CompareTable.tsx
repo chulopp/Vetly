@@ -200,10 +200,10 @@ export function CompareTable({ initialOffers = [] }: { initialOffers?: OfferReco
 
       {sorted.length > PAGE_SIZE && (
         <div className="mt-4 flex flex-wrap items-center justify-between gap-3 px-1 text-xs">
-          <p className="text-ink-400">
-            Showing <span className="font-medium text-ink-200 tnum">{startIndex + 1}</span>–
-            <span className="font-medium text-ink-200 tnum">{endIndex}</span> of{' '}
-            <span className="font-medium text-ink-200 tnum">{sorted.length}</span> offers
+          <p className="text-ink-500">
+            Showing <span className="tnum">{startIndex + 1}</span>–
+            <span className="tnum">{endIndex}</span> of{' '}
+            <span className="tnum">{sorted.length}</span> offers
           </p>
 
           <div className="flex items-center gap-1.5">
@@ -211,7 +211,7 @@ export function CompareTable({ initialOffers = [] }: { initialOffers?: OfferReco
               type="button"
               onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
               disabled={safePage === 1}
-              className="inline-flex items-center gap-1 rounded-lg border border-white/10 bg-white/[0.04] px-2.5 py-1 text-ink-300 transition-colors hover:bg-white/[0.08] hover:text-white disabled:pointer-events-none disabled:opacity-30"
+              className="inline-flex items-center gap-1 rounded-lg px-2 py-1 text-ink-400 transition-colors hover:bg-white/[0.08] hover:text-white disabled:pointer-events-none disabled:opacity-25"
               aria-label="Previous page"
             >
               <ChevronLeft className="size-3.5" />
@@ -241,7 +241,7 @@ export function CompareTable({ initialOffers = [] }: { initialOffers?: OfferReco
               type="button"
               onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
               disabled={safePage === totalPages}
-              className="inline-flex items-center gap-1 rounded-lg border border-white/10 bg-white/[0.04] px-2.5 py-1 text-ink-300 transition-colors hover:bg-white/[0.08] hover:text-white disabled:pointer-events-none disabled:opacity-30"
+              className="inline-flex items-center gap-1 rounded-lg px-2 py-1 text-ink-400 transition-colors hover:bg-white/[0.08] hover:text-white disabled:pointer-events-none disabled:opacity-25"
               aria-label="Next page"
             >
               <span>Next</span>
