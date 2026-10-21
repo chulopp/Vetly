@@ -3,6 +3,9 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { usePathname, useSearchParams } from 'next/navigation';
 
+/**
+ * 2px ultra-thin top progress bar for seamless route transitions.
+ */
 export default function TopLoader() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
