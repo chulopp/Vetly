@@ -188,13 +188,16 @@ body {
   animation: pill-shimmer-sweep 4s cubic-bezier(0.4, 0, 0.2, 1) infinite;
 }
 
-/* Electric lightning pulse on CTA button icon */
+/* Smooth sweeping light shimmer across CTA button: enters left, exits right, pauses offscreen, loops */
 @keyframes btn-shimmer-sweep {
-  0%, 20% {
-    transform: translateX(-100%);
+  0% {
+    transform: translateX(-150%) skewX(-20deg);
   }
-  70%, 100% {
-    transform: translateX(100%);
+  42% {
+    transform: translateX(250%) skewX(-20deg);
+  }
+  100% {
+    transform: translateX(250%) skewX(-20deg);
   }
 }
 

@@ -15,6 +15,7 @@
  */
 
 const STORAGE_KEY = 'myOffers';
+export const MAX_OFFERS = 50;
 
 function isBrowser(): boolean {
   return typeof window !== 'undefined' && typeof localStorage !== 'undefined';
@@ -35,9 +36,10 @@ export function getMyOffers(): string[] {
 export function addMyOffer(id: string): void {
   if (!isBrowser()) return;
   try {
-    const ids = new Set(getMyOffers());
-    ids.add(id);
-    localStorage.setItem(STORAGE_KEY, JSON.stringify([...ids]));
+    const existing = getMyOffers().filter((existingId) => existingId !== id);
+    existing.push(id);
+    const trimmed = existing.length > MAX_OFFERS ? existing.slice(existing.length - MAX_OFFERS) : existing;
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(trimmed));
   } catch {
     // storage unavailable (private mode etc.) — the offer is still saved server-side
   }

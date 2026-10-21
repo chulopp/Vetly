@@ -63,7 +63,7 @@ export default function Hero({ onStartAnalyzing, cardExpanded }: HeroProps) {
           >
             {/* Slow full-button light slide shimmer sweep */}
             <div
-              className="pointer-events-none absolute inset-0 -translate-x-full animate-btn-shimmer bg-gradient-to-r from-transparent via-white/[0.22] to-transparent"
+              className="pointer-events-none absolute inset-0 animate-btn-shimmer bg-gradient-to-r from-transparent via-white/25 to-transparent"
               aria-hidden="true"
             />
             <Lightning className="size-3.5 text-white sm:size-4" weight="light" />

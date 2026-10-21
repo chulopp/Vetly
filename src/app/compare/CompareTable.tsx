@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { ArrowDown, ArrowUp, ArrowUpDown, Plus } from 'lucide-react';
+import { ArrowDown, ArrowUp, ArrowUpDown, ChevronLeft, ChevronRight, Plus } from 'lucide-react';
 import { ActionBadge, TierBadge } from '@/components/ui/badges';
 import { formatMoney } from '@/lib/currency';
 import { formatMargin } from '@/lib/engine';
@@ -11,6 +11,8 @@ import type { RecommendAction, RiskTier } from '@/lib/engine/types';
 import { getMyOffers } from '@/lib/myOffers';
 import type { OfferRecord } from '@/lib/offers/service';
 import { cn } from '@/lib/utils';
+
+const PAGE_SIZE = 10;
 
 type SortKey =
   | 'createdAt'
@@ -42,6 +44,7 @@ export function CompareTable({ initialOffers = [] }: { initialOffers?: OfferReco
   const router = useRouter();
   const [offers, setOffers] = useState<OfferRecord[]>(initialOffers);
   const [sort, setSort] = useState<{ key: SortKey; dir: SortDir }>({ key: 'createdAt', dir: 'desc' });
+  const [currentPage, setCurrentPage] = useState(1);
 
   useEffect(() => {
     const localIds = getMyOffers();
@@ -91,7 +94,14 @@ export function CompareTable({ initialOffers = [] }: { initialOffers?: OfferReco
         ? { key, dir: prev.dir === 'asc' ? 'desc' : 'asc' }
         : { key, dir: key === 'createdAt' ? 'desc' : 'asc' },
     );
+    setCurrentPage(1);
   }
+
+  const totalPages = Math.max(1, Math.ceil(sorted.length / PAGE_SIZE));
+  const safePage = Math.min(Math.max(1, currentPage), totalPages);
+  const startIndex = (safePage - 1) * PAGE_SIZE;
+  const endIndex = Math.min(startIndex + PAGE_SIZE, sorted.length);
+  const paginatedOffers = sorted.slice(startIndex, endIndex);
 
   if (offers.length === 0) {
     return (
@@ -151,7 +161,7 @@ export function CompareTable({ initialOffers = [] }: { initialOffers?: OfferReco
               </tr>
             </thead>
             <tbody>
-              {sorted.map((offer) => (
+              {paginatedOffers.map((offer) => (
                 <tr
                   key={offer.id}
                   tabIndex={0}
@@ -187,6 +197,60 @@ export function CompareTable({ initialOffers = [] }: { initialOffers?: OfferReco
           </table>
         </div>
       </div>
+
+      {sorted.length > PAGE_SIZE && (
+        <div className="mt-4 flex flex-wrap items-center justify-between gap-3 px-1 text-xs">
+          <p className="text-ink-400">
+            Showing <span className="font-medium text-ink-200 tnum">{startIndex + 1}</span>–
+            <span className="font-medium text-ink-200 tnum">{endIndex}</span> of{' '}
+            <span className="font-medium text-ink-200 tnum">{sorted.length}</span> offers
+          </p>
+
+          <div className="flex items-center gap-1.5">
+            <button
+              type="button"
+              onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+              disabled={safePage === 1}
+              className="inline-flex items-center gap-1 rounded-lg border border-white/10 bg-white/[0.04] px-2.5 py-1 text-ink-300 transition-colors hover:bg-white/[0.08] hover:text-white disabled:pointer-events-none disabled:opacity-30"
+              aria-label="Previous page"
+            >
+              <ChevronLeft className="size-3.5" />
+              <span>Prev</span>
+            </button>
+
+            <div className="flex items-center gap-1">
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map((pageNum) => (
+                <button
+                  key={pageNum}
+                  type="button"
+                  onClick={() => setCurrentPage(pageNum)}
+                  className={cn(
+                    'h-7 min-w-7 rounded-lg px-2 text-xs transition-colors tnum',
+                    safePage === pageNum
+                      ? 'bg-white/15 font-semibold text-white shadow-sm'
+                      : 'text-ink-400 hover:bg-white/[0.06] hover:text-ink-200',
+                  )}
+                  aria-current={safePage === pageNum ? 'page' : undefined}
+                >
+                  {pageNum}
+                </button>
+              ))}
+            </div>
+
+            <button
+              type="button"
+              onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+              disabled={safePage === totalPages}
+              className="inline-flex items-center gap-1 rounded-lg border border-white/10 bg-white/[0.04] px-2.5 py-1 text-ink-300 transition-colors hover:bg-white/[0.08] hover:text-white disabled:pointer-events-none disabled:opacity-30"
+              aria-label="Next page"
+            >
+              <span>Next</span>
+              <ChevronRight className="size-3.5" />
+            </button>
+          </div>
+        </div>
+      )}
+
       <p className="mt-3 text-xs text-ink-500">Click a row to open the full analysis.</p>
     </>
   );
