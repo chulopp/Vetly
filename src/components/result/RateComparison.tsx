@@ -36,9 +36,6 @@ export default function RateComparison({ offer }: { offer: OfferRecord }) {
   const segmentLeft = Math.min(actualPos, targetPos);
   const segmentWidth = Math.max(2, Math.abs(actualPos - targetPos));
 
-  // Clean em-dash from margin proximity message if any
-  const proximityMessage = analysis.marginProximity.message.replace(/\s*—\s*/g, ', ');
-
   return (
     <div className="glass animate-fade-up rounded-2xl p-6 md:p-7">
       {/* Top Header & Margin Badge */}
@@ -55,7 +52,7 @@ export default function RateComparison({ offer }: { offer: OfferRecord }) {
                 : 'border border-reject/30 bg-reject/15 text-reject',
             )}
           >
-            {isSurplus ? `+${formatMargin(margin)}% surplus` : `${formatMargin(margin)}% deficit`}
+            {isSurplus ? `${formatMargin(margin)}% surplus` : `${formatMargin(margin)}% deficit`}
           </span>
         </div>
       </div>
@@ -89,9 +86,8 @@ export default function RateComparison({ offer }: { offer: OfferRecord }) {
 
       {/* Horizontal Comparison Visual Gauge Bar */}
       <div className="mt-8 rounded-xl border border-white/5 bg-white/[0.02] p-4 sm:p-5">
-        <div className="flex items-center justify-between text-[11px] font-medium text-ink-500">
+        <div className="text-[11px] font-medium text-ink-500">
           <span>Comparison Visualizer</span>
-          <span className="tnum text-ink-400">{proximityMessage}</span>
         </div>
 
         {/* The Track with 2 Pins & Delta Segment */}

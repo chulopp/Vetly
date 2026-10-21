@@ -109,6 +109,7 @@ export default async function ResultPage({
           <DecisionBadge
             action={analysis.recommendAction}
             summary={generateVerdictSummary(offer)}
+            offer={offer}
           />
           <RateComparison offer={offer} />
           <RiskBreakdown analysis={analysis} />

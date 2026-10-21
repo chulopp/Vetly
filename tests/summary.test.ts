@@ -40,6 +40,7 @@ describe('generateVerdictSummary', () => {
     const summary = generateVerdictSummary({ input, analysis });
 
     expect(summary).not.toContain('—');
+    expect(summary).not.toContain('++');
     expect(summary).toContain('more per hour than your target');
     expect(summary).toContain('surplus');
     expect(summary).toContain('safe and ready to accept');
@@ -61,6 +62,7 @@ describe('generateVerdictSummary', () => {
     const summary = generateVerdictSummary({ input, analysis });
 
     expect(summary).not.toContain('—');
+    expect(summary).not.toContain('++');
     expect(summary).toContain('surplus');
     expect(summary).toContain('client risk is');
   });

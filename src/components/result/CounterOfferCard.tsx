@@ -19,10 +19,6 @@ export default function CounterOfferCard({
       <div className="text-[11px] font-medium uppercase tracking-[0.14em] text-ink-500">
         Your counter-offer
       </div>
-      <p className="mt-1.5 text-xs leading-relaxed text-ink-500">
-        A reasonable number to counter with. A starting point for negotiation, not a guarantee the
-        client will accept it.
-      </p>
 
       <div className="mt-4 space-y-3">
         {counterOffer.suggestedBudget != null && (

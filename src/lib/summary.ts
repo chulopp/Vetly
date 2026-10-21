@@ -59,7 +59,7 @@ export function generateVerdictSummary({ input, analysis }: SummaryData): string
 
   if (analysis.recommendAction === 'ACCEPT') {
     if (isSurplus && diff > 0) {
-      return `This deal pays ${diffFormatted} more per hour than your target (+${marginFormatted}% surplus) with low client risk, safe and ready to accept.`;
+      return `This deal pays ${diffFormatted} more per hour than your target (${marginFormatted}% surplus) with low client risk, safe and ready to accept.`;
     }
     return `This deal meets your target rate with low client risk, safe and ready to accept.`;
   }
@@ -73,9 +73,9 @@ export function generateVerdictSummary({ input, analysis }: SummaryData): string
     }
     // Surplus budget but REJECT due to high risk
     if (driversText) {
-      return `The budget clears your target by ${diffFormatted} per hour (+${marginFormatted}%), but client risk is HIGH due to ${driversText}, reject as-is unless terms are fixed.`;
+      return `The budget clears your target by ${diffFormatted} per hour (${marginFormatted}%), but client risk is HIGH due to ${driversText}, reject as-is unless terms are fixed.`;
     }
-    return `The budget clears your target by ${diffFormatted} per hour (+${marginFormatted}%), but client risk is HIGH, reject as-is unless terms are fixed.`;
+    return `The budget clears your target by ${diffFormatted} per hour (${marginFormatted}%), but client risk is HIGH, reject as-is unless terms are fixed.`;
   }
 
   // NEGOTIATE
@@ -88,7 +88,7 @@ export function generateVerdictSummary({ input, analysis }: SummaryData): string
 
   // Rate clears target, but NEGOTIATE due to medium/high risk terms
   if (driversText) {
-    return `The rate clears your target by ${diffFormatted} per hour (+${marginFormatted}% surplus), but client risk is ${analysis.riskTier} due to ${driversText}.`;
+    return `The rate clears your target by ${diffFormatted} per hour (${marginFormatted}% surplus), but client risk is ${analysis.riskTier} due to ${driversText}.`;
   }
-  return `The rate clears your target by ${diffFormatted} per hour (+${marginFormatted}% surplus), but client risk is ${analysis.riskTier}, negotiate terms before accepting.`;
+  return `The rate clears your target by ${diffFormatted} per hour (${marginFormatted}% surplus), but client risk is ${analysis.riskTier}, negotiate terms before accepting.`;
 }
