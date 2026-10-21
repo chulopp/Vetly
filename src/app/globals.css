@@ -63,29 +63,23 @@ body {
 /* ── Glass materials (manual CSS approach — locked plan decision #3) ── */
 
 .glass {
-  background: rgba(14, 17, 24, 0.75);
-  -webkit-backdrop-filter: blur(12px) saturate(150%);
-  backdrop-filter: blur(12px) saturate(150%);
+  background: rgba(255, 255, 255, 0.055);
+  -webkit-backdrop-filter: blur(18px) saturate(150%);
+  backdrop-filter: blur(18px) saturate(150%);
   border: 1px solid rgba(255, 255, 255, 0.12);
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.08),
-    0 12px 32px -8px rgba(0, 0, 0, 0.5);
-  overflow: hidden;
-  isolation: isolate;
-  contain: paint;
+    inset 0 1px 0 rgba(255, 255, 255, 0.07),
+    0 10px 34px rgba(0, 0, 0, 0.38);
 }
 
 .glass-strong {
-  background: rgba(14, 17, 24, 0.85);
-  -webkit-backdrop-filter: blur(16px) saturate(160%);
-  backdrop-filter: blur(16px) saturate(160%);
+  background: rgba(255, 255, 255, 0.085);
+  -webkit-backdrop-filter: blur(24px) saturate(160%);
+  backdrop-filter: blur(24px) saturate(160%);
   border: 1px solid rgba(255, 255, 255, 0.16);
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.1),
-    0 16px 40px -8px rgba(0, 0, 0, 0.6);
-  overflow: hidden;
-  isolation: isolate;
-  contain: paint;
+    0 14px 44px rgba(0, 0, 0, 0.45);
 }
 
 /* ── Volta-inspired window / card ── */
