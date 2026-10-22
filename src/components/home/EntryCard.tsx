@@ -14,8 +14,8 @@ import {
   riskTier,
   tierProximity,
 } from '@/lib/engine';
-import type { OfferFlag, OfferInput } from '@/lib/engine/types';
-import { addMyOffer } from '@/lib/myOffers';
+import type { AnalysisResult, OfferFlag, OfferInput } from '@/lib/engine/types';
+import { addMyOffer, saveCachedOffer } from '@/lib/myOffers';
 import { OfferInputSchema, zodToIssues, type ExtractedFields, type ValidationIssue } from '@/lib/validation/offer';
 import { cn } from '@/lib/utils';
 import {
@@ -308,7 +308,16 @@ export default function EntryCard({ expanded, onExpand }: EntryCardProps = {}) {
 
       if (response.status === 201 && data && typeof (data as { id?: unknown }).id === 'string') {
         const id = (data as { id: string }).id;
+        const analysis = (data as { analysis?: AnalysisResult }).analysis;
         addMyOffer(id);
+        if (analysis) {
+          saveCachedOffer({
+            id,
+            input: payload,
+            analysis,
+            createdAt: new Date().toISOString(),
+          });
+        }
         window.location.assign(`/result/${id}`);
         return; // keep the progress state during the redirect (PRD §3.5.2)
       }

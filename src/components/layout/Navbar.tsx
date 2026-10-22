@@ -40,6 +40,7 @@ export default function Navbar() {
         </Link>
         <Link
           href="/compare"
+          prefetch={false}
           aria-label="Saved offers"
           className="btn-volta-cta flex items-center justify-center rounded-full px-3.5 py-1 text-xs font-medium text-white sm:px-4 sm:py-1.5"
         >

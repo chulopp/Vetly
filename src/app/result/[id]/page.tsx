@@ -71,16 +71,26 @@ export default async function ResultPage({
     search.visitor !== undefined ||
     search.guest !== undefined ||
     search.preview !== undefined ||
+    search['view-only'] !== undefined ||
+    search.view_only !== undefined ||
+    search.viewonly !== undefined ||
     search.view === 'shared' ||
     search.view === 'readonly' ||
     search.view === 'read-only' ||
     search.view === 'public' ||
     search.view === 'visitor' ||
+    search.view === 'view-only' ||
+    search.view === 'view_only' ||
+    search.view === 'only' ||
     search.mode === 'shared' ||
     search.mode === 'readonly' ||
     search.mode === 'read-only' ||
     search.mode === 'public' ||
-    search.mode === 'visitor';
+    search.mode === 'visitor' ||
+    search.mode === 'view-only' ||
+    search.mode === 'view_only' ||
+    search.mode === 'view' ||
+    search.mode === 'only';
 
   if (!OFFER_ID_PATTERN.test(id)) notFound();
 

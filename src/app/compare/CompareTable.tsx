@@ -8,7 +8,7 @@ import { ActionBadge, TierBadge } from '@/components/ui/badges';
 import { formatMoney } from '@/lib/currency';
 import { formatMargin } from '@/lib/engine';
 import type { RecommendAction, RiskTier } from '@/lib/engine/types';
-import { getMyOffers } from '@/lib/myOffers';
+import { getMyOffers, getCachedOffers, saveCachedOffer } from '@/lib/myOffers';
 import type { OfferRecord } from '@/lib/offers/service';
 import { cn } from '@/lib/utils';
 
@@ -42,18 +42,34 @@ const COLUMNS: Array<{ key: SortKey; label: string }> = [
  */
 export function CompareTable({ initialOffers = [] }: { initialOffers?: OfferRecord[] }) {
   const router = useRouter();
-  const [offers, setOffers] = useState<OfferRecord[]>(initialOffers);
+  const [offers, setOffers] = useState<OfferRecord[]>(() => {
+    if (initialOffers.length > 0) return initialOffers;
+    return getCachedOffers();
+  });
   const [sort, setSort] = useState<{ key: SortKey; dir: SortDir }>({ key: 'createdAt', dir: 'desc' });
   const [currentPage, setCurrentPage] = useState(1);
 
   useEffect(() => {
+    // Cache any server-provided offers locally
+    for (const off of initialOffers) {
+      saveCachedOffer(off);
+    }
+
     const localIds = getMyOffers();
-    if (localIds.length > initialOffers.length) {
+    const currentCached = getCachedOffers();
+    if (offers.length === 0 && currentCached.length > 0) {
+      setOffers(currentCached);
+    }
+
+    if (localIds.length > offers.length || initialOffers.length > offers.length) {
       fetch(`/api/offers?ids=${encodeURIComponent(localIds.join(','))}`)
         .then((res) => (res.ok ? res.json() : null))
         .then((data) => {
-          if (data && Array.isArray(data.offers) && data.offers.length > initialOffers.length) {
+          if (data && Array.isArray(data.offers) && data.offers.length > 0) {
             setOffers(data.offers);
+            for (const off of data.offers) {
+              saveCachedOffer(off);
+            }
           } else if (initialOffers.length > 0) {
             setOffers(initialOffers);
           }
@@ -64,7 +80,7 @@ export function CompareTable({ initialOffers = [] }: { initialOffers?: OfferReco
     } else if (initialOffers.length > 0) {
       setOffers(initialOffers);
     }
-  }, [initialOffers]);
+  }, [initialOffers, offers.length]);
 
   const sorted = useMemo(() => {
     const list = [...offers];

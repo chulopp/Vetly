@@ -62,7 +62,9 @@ export default function OwnerActions({ offerId, isOwner }: OwnerActionsProps) {
       window.location.search.includes('preview') ||
       window.location.search.includes('readonly') ||
       window.location.search.includes('read_only') ||
-      window.location.search.includes('read-only'));
+      window.location.search.includes('read-only') ||
+      window.location.search.includes('view-only') ||
+      window.location.search.includes('view_only'));
 
   if (!isOwner || isClientShare) {
     return (
@@ -70,10 +72,12 @@ export default function OwnerActions({ offerId, isOwner }: OwnerActionsProps) {
         <p className="text-sm text-ink-300">This analysis was shared with you.</p>
         <Link
           href="/"
+          aria-label="Analyze a deal"
+          data-testid="analyze-deal-cta"
           className="mt-3.5 inline-flex items-center gap-2 rounded-xl bg-ink-100 px-5 py-2.5 text-sm font-semibold text-base-950 transition hover:bg-white"
         >
           <Plus className="size-4" />
-          Analyze a deal
+          <span>Analyze a deal</span>
         </Link>
       </div>
     );
@@ -85,15 +89,9 @@ export default function OwnerActions({ offerId, isOwner }: OwnerActionsProps) {
         Your saved offer
       </div>
       <div className="mt-3 grid grid-cols-2 gap-2.5">
-        <a
-          href={`/share/${offerId}`}
-          onClick={(e) => {
-            if (!e.metaKey && !e.ctrlKey && !e.shiftKey && !e.altKey && e.button === 0) {
-              e.preventDefault();
-              void handleCopyLink();
-            }
-          }}
-          data-share-url={`/share/${offerId}`}
+        <button
+          type="button"
+          onClick={handleCopyLink}
           aria-label={copied ? 'Result link copied' : 'Copy share link'}
           className="flex items-center justify-center gap-1.5 rounded-xl border border-white/15 bg-white/[0.03] px-3 py-2.5 text-xs font-medium text-ink-300 transition hover:border-white/30 hover:text-ink-100"
         >
@@ -101,7 +99,7 @@ export default function OwnerActions({ offerId, isOwner }: OwnerActionsProps) {
           <span role="status" aria-live="polite">
             {copied ? 'Result link copied' : 'Copy share link'}
           </span>
-        </a>
+        </button>
         <Link
           href={`/?prefill=${offerId}`}
           className="flex items-center justify-center gap-1.5 rounded-xl border border-white/15 bg-white/[0.03] px-3 py-2.5 text-xs font-medium text-ink-300 transition hover:border-white/30 hover:text-ink-100"
@@ -124,6 +122,25 @@ export default function OwnerActions({ offerId, isOwner }: OwnerActionsProps) {
           <Plus className="size-3.5" />
           New analysis
         </Link>
+      </div>
+
+      <div className="mt-3 flex items-center gap-2 rounded-xl border border-white/10 bg-white/[0.02] p-1.5">
+        <input
+          type="text"
+          readOnly
+          value={typeof window !== 'undefined' ? `${window.location.origin}/share/${offerId}` : `/share/${offerId}`}
+          data-testid="share-link-input"
+          aria-label="Shareable link URL"
+          className="min-w-0 flex-1 bg-transparent px-2 text-[11px] text-ink-300 font-mono select-all focus:outline-none"
+          onClick={(e) => (e.target as HTMLInputElement).select()}
+        />
+        <a
+          href={`/share/${offerId}`}
+          aria-label="Open shared view"
+          className="shrink-0 rounded-lg bg-white/[0.06] px-2.5 py-1 text-[11px] font-medium text-ink-200 transition hover:bg-white/[0.12] hover:text-white"
+        >
+          Open link
+        </a>
       </div>
     </div>
   );
