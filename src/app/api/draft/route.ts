@@ -41,12 +41,6 @@ export async function POST(request: Request) {
         { status: 404 },
       );
     }
-    if (!offer.analysis.counterOffer) {
-      return NextResponse.json(
-        { error: 'NO_COUNTER_OFFER', message: 'This offer did not trigger a counter-offer.' },
-        { status: 400 },
-      );
-    }
     if (offer.draftMessage) {
       return NextResponse.json({ ok: true, message: offer.draftMessage });
     }

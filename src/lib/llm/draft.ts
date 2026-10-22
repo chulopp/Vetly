@@ -53,58 +53,96 @@ function roundCleanRate(amount: number, currency: string): string {
 }
 
 /**
- * Stretch feature (PRD §3.3): drafts a ready-to-send negotiation message from
- * the ALREADY-COMPUTED counter-offer — the numbers are derived from the
- * deterministic engine and presented naturally for a human business conversation.
- * Failure resolves to { ok: false, message: null } — the raw numbers and conditions
- * are still shown by the UI, so nothing is ever lost.
+ * Stretch feature (PRD §3.3): drafts a ready-to-send reply message:
+ * - For ACCEPT deals: drafts a warm, professional acceptance & kickoff message.
+ * - For NEGOTIATE / REJECT deals: drafts a negotiation counter-offer derived from the
+ *   deterministic engine and presented naturally for a human business conversation.
+ * Failure resolves to { ok: false, message: null } — nothing is ever lost.
  */
 export async function draftNegotiationMessage(offer: OfferRecord): Promise<DraftOutcome> {
+  const isAccept = offer.analysis.recommendAction === 'ACCEPT' || !offer.analysis.counterOffer;
   const counter = offer.analysis.counterOffer;
-  if (!counter) {
-    return { ok: false, message: null, error: 'llm_invalid_response' };
-  }
 
   const cleanBudget = cleanMoney(offer.input.budget, offer.input.currency);
   const cleanTargetRate = cleanMoney(offer.input.targetRate, offer.input.currency);
   const approxRate = roundCleanRate(offer.analysis.effectiveHourlyRate, offer.input.currency);
-  const deficitRounded = Math.abs(Math.round(offer.analysis.profitabilityMargin));
-  const deficitPhrase =
-    offer.analysis.profitabilityMargin < 0
-      ? `roughly ${deficitRounded}% below my standard target rate`
-      : `close to my standard target rate`;
 
-  const system =
-    'You draft professional, polite, and direct business negotiation emails in English for freelance professionals.\n' +
-    'Formatting rules:\n' +
-    '1. ALWAYS start with "Hi [Client Name]," on the first line.\n' +
-    '2. ALWAYS end with "Best regards,\n[Your Name]" on the final lines.\n' +
-    '3. Keep the body between roughly 100 and 160 words, warm yet firm, ready to send as-is without any subject line.\n' +
-    '4. Present monetary figures naturally as conversational estimates without awkward cents (e.g. use "around $9/hour", "a budget of $4,970"). NEVER use raw negative percentage formulas like "-69.83%".\n' +
-    '5. NEVER use long dash lines (em-dash "—" or en-dash "–") anywhere in your message. Use commas, periods, or standard hyphens instead.\n' +
-    'Respond ONLY with a JSON object: {"message": "<the full email text>"}';
+  let system: string;
+  let lines: string[];
 
-  const lines = [
-    'Draft my counter-offer email for a freelance project.',
-    `Currency: ${offer.input.currency}`,
-    `Client's current offer: total budget of ${cleanBudget} for about ${offer.input.estimatedHours} hours of work.`,
-    `My standard target rate: ${cleanTargetRate}/hour.`,
-    `The current offer works out to: ${approxRate} (${deficitPhrase}).`,
-  ];
+  if (isAccept) {
+    system =
+      'You draft professional, enthusiastic, and direct business acceptance and project kickoff emails in English for freelance professionals.\n' +
+      'Formatting rules:\n' +
+      '1. ALWAYS start with "Hi [Client Name]," on the first line.\n' +
+      '2. ALWAYS end with "Best regards,\n[Your Name]" on the final lines.\n' +
+      '3. Keep the body between roughly 100 and 150 words, warm, enthusiastic, yet professional, ready to send as-is without any subject line.\n' +
+      '4. Present monetary figures naturally as conversational figures without awkward cents (e.g. use "total budget of $8,000").\n' +
+      '5. NEVER use long dash lines (em-dash "—" or en-dash "–") anywhere in your message. Use commas, periods, or standard hyphens instead.\n' +
+      'Respond ONLY with a JSON object: {"message": "<the full email text>"}';
 
-  if (counter.budgetTriggered && counter.suggestedBudget != null) {
-    const counterBudgetStr = roundCleanBudget(counter.suggestedBudget, offer.input.currency);
+    lines = [
+      'Draft my project acceptance and kickoff email for a freelance project.',
+      `Currency: ${offer.input.currency}`,
+      `Client's offer: total budget of ${cleanBudget} for about ${offer.input.estimatedHours} hours of work.`,
+      `Intent: Warmly accept the offer and confirm agreement with the scope and budget.`,
+    ];
+
+    if (offer.input.depositPercent > 0) {
+      lines.push(
+        `Next steps: State that to secure the project on the calendar and commence work, you will follow up with the formal agreement (Scope of Work) and the invoice for the ${offer.input.depositPercent}% upfront deposit.`,
+      );
+    } else {
+      lines.push(
+        `Next steps: State that to secure the project on the calendar and commence work, you will follow up with the formal agreement (Scope of Work) and the invoice for the first milestone payment.`,
+      );
+    }
     lines.push(
-      `Counter budget for full scope: ${counterBudgetStr}. Express this as a clean, realistic minimum budget to hit my target rate.`,
+      'Closing action: Ask about their availability for a brief kickoff call or to confirm the target kickoff date.',
     );
-  }
-  if (counter.budgetTriggered && counter.maxExecutableHours != null && counter.maxExecutableHours > 0) {
-    lines.push(
-      `Scope cap alternative: if their budget is fixed at ${cleanBudget}, offer to cap the scope at roughly ${counter.maxExecutableHours} focused hours.`,
-    );
-  }
-  if (counter.riskTriggered && counter.contractConditions.length > 0) {
-    lines.push(`Required project terms to weave in naturally: ${counter.contractConditions.join(' ')}`);
+  } else {
+    if (!counter) {
+      return { ok: false, message: null, error: 'llm_invalid_response' };
+    }
+
+    const deficitRounded = Math.abs(Math.round(offer.analysis.profitabilityMargin));
+    const deficitPhrase =
+      offer.analysis.profitabilityMargin < 0
+        ? `roughly ${deficitRounded}% below my standard target rate`
+        : `close to my standard target rate`;
+
+    system =
+      'You draft professional, polite, and direct business negotiation emails in English for freelance professionals.\n' +
+      'Formatting rules:\n' +
+      '1. ALWAYS start with "Hi [Client Name]," on the first line.\n' +
+      '2. ALWAYS end with "Best regards,\n[Your Name]" on the final lines.\n' +
+      '3. Keep the body between roughly 100 and 160 words, warm yet firm, ready to send as-is without any subject line.\n' +
+      '4. Present monetary figures naturally as conversational estimates without awkward cents (e.g. use "around $9/hour", "a budget of $4,970"). NEVER use raw negative percentage formulas like "-69.83%".\n' +
+      '5. NEVER use long dash lines (em-dash "—" or en-dash "–") anywhere in your message. Use commas, periods, or standard hyphens instead.\n' +
+      'Respond ONLY with a JSON object: {"message": "<the full email text>"}';
+
+    lines = [
+      'Draft my counter-offer email for a freelance project.',
+      `Currency: ${offer.input.currency}`,
+      `Client's current offer: total budget of ${cleanBudget} for about ${offer.input.estimatedHours} hours of work.`,
+      `My standard target rate: ${cleanTargetRate}/hour.`,
+      `The current offer works out to: ${approxRate} (${deficitPhrase}).`,
+    ];
+
+    if (counter.budgetTriggered && counter.suggestedBudget != null) {
+      const counterBudgetStr = roundCleanBudget(counter.suggestedBudget, offer.input.currency);
+      lines.push(
+        `Counter budget for full scope: ${counterBudgetStr}. Express this as a clean, realistic minimum budget to hit my target rate.`,
+      );
+    }
+    if (counter.budgetTriggered && counter.maxExecutableHours != null && counter.maxExecutableHours > 0) {
+      lines.push(
+        `Scope cap alternative: if their budget is fixed at ${cleanBudget}, offer to cap the scope at roughly ${counter.maxExecutableHours} focused hours.`,
+      );
+    }
+    if (counter.riskTriggered && counter.contractConditions.length > 0) {
+      lines.push(`Required project terms to weave in naturally: ${counter.contractConditions.join(' ')}`);
+    }
   }
 
   const raw = await chatJson(
@@ -120,17 +158,25 @@ export async function draftNegotiationMessage(offer: OfferRecord): Promise<Draft
   }
   const message = (raw as { message?: unknown }).message;
   if (typeof message === 'string' && message.trim().length > 0) {
-    let sanitized = message.trim().replace(/\s*[—–]\s*/g, ', ');
+    let sanitized = message.trim();
 
-    // Guarantee opening greeting
-    if (!sanitized.match(/^(hi|hello|dear)\s+\[?client/i)) {
-      sanitized = `Hi [Client Name],\n\n${sanitized}`;
+    // 1. Remove all long dashes (em-dash and en-dash)
+    sanitized = sanitized.replace(/\s*[—–]\s*/g, ', ').replace(/[—–]/g, '-');
+
+    // 2. Guarantee opening greeting strictly starts with "Hi [Client Name],"
+    if (!sanitized.startsWith('Hi [Client Name],')) {
+      sanitized = sanitized.replace(/^(dear|hi|hello)\s+[^,\n]+,\s*/i, '');
+      sanitized = `Hi [Client Name],\n\n${sanitized.trim()}`;
     }
 
-    // Guarantee closing sign-off
-    if (!sanitized.match(/\[?your name\]?$/i) && !sanitized.match(/best regards/i)) {
-      sanitized = `${sanitized}\n\nBest regards,\n[Your Name]`;
+    // 3. Guarantee closing sign-off strictly ends with "Best regards,\n[Your Name]"
+    if (!sanitized.endsWith('Best regards,\n[Your Name]')) {
+      sanitized = sanitized.replace(/\n+(best regards|sincerely|warm regards|thanks)[^\n]*(\n+[^\n]+)?$/i, '');
+      sanitized = `${sanitized.trim()}\n\nBest regards,\n[Your Name]`;
     }
+
+    // Final safety check against any stray long dashes
+    sanitized = sanitized.replace(/[—–]/g, '-');
 
     return { ok: true, message: sanitized, error: null };
   }

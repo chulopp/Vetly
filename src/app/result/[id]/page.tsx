@@ -133,9 +133,7 @@ export default async function ResultPage({
           {analysis.counterOffer?.riskTriggered && (
             <ContractConditions counterOffer={analysis.counterOffer} />
           )}
-          {analysis.counterOffer && (
-            <DraftMessage offerId={offer.id} initialDraft={offer.draftMessage} />
-          )}
+          <DraftMessage offerId={offer.id} initialDraft={offer.draftMessage} />
           <OwnerActions offerId={offer.id} isOwner={isOwner} />
         </div>
       </div>

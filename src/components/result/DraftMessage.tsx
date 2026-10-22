@@ -94,7 +94,7 @@ export default function DraftMessage({ offerId, initialDraft }: DraftMessageProp
           ) : (
             <>
               <Sparkles className="size-4 text-white" />
-              <span>Draft a negotiation message</span>
+              <span>Draft a reply message</span>
             </>
           )}
         </button>
@@ -102,7 +102,7 @@ export default function DraftMessage({ offerId, initialDraft }: DraftMessageProp
 
       {status === 'error' && (
         <p className="mt-2.5 text-xs text-ink-500">
-          Couldn&apos;t draft a message. Your counter-offer numbers above are all you need.
+          Couldn&apos;t draft a message right now. Please try again in a moment.
         </p>
       )}
 
