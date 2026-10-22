@@ -73,6 +73,7 @@ describe('OfferInputSchema — every PRD 3.4 rejection maps to a field-specific 
     ['terms negative', { paymentTermsDays: -1 }, 'paymentTermsDays', 'Payment terms must be between 0 and 365 days.'],
     ['terms over 365', { paymentTermsDays: 366 }, 'paymentTermsDays', 'Payment terms must be between 0 and 365 days.'],
     ['revisions negative', { allowedRevisions: -1 }, 'allowedRevisions', 'Allowed revisions must be 0 or more.'],
+    ['revisions over 20', { allowedRevisions: 21 }, 'allowedRevisions', 'Allowed revisions must be 20 or fewer.'],
     ['revisions non-integer', { allowedRevisions: 2.5 }, 'allowedRevisions', 'Allowed revisions must be a whole number of 0 or more.'],
     ['currency unknown', { currency: 'XYZ' }, 'currency', CURRENCY_MESSAGE],
     ['currency wrong type', { currency: 123 }, 'currency', CURRENCY_MESSAGE],

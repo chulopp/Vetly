@@ -92,6 +92,8 @@ export default function OwnerActions({ offerId, isOwner }: OwnerActionsProps) {
         <button
           type="button"
           onClick={handleCopyLink}
+          data-share-url={typeof window !== 'undefined' ? `${window.location.origin}/share/${offerId}` : `/share/${offerId}`}
+          data-testid="copy-share-link"
           aria-label={copied ? 'Result link copied' : 'Copy share link'}
           className="flex items-center justify-center gap-1.5 rounded-xl border border-white/15 bg-white/[0.03] px-3 py-2.5 text-xs font-medium text-ink-300 transition hover:border-white/30 hover:text-ink-100"
         >

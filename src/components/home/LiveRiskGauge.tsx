@@ -48,13 +48,11 @@ function useAnimatedNumber(target: number, duration = 380): number {
  * in real time.
  */
 export default function LiveRiskGauge({ score, tier, proximity, contributions, assumingDefaults }: LiveRiskGaugeProps) {
-  const animatedScore = useAnimatedNumber(score);
-
   return (
     <div className="glass rounded-2xl p-5">
       <div className="text-[11px] font-medium uppercase tracking-[0.14em] text-ink-500">Live client risk</div>
       <div className="mt-2 flex items-baseline gap-1.5">
-        <span className="text-4xl font-semibold tnum text-ink-100">{animatedScore}</span>
+        <span data-testid="live-risk-score" className="text-4xl font-semibold tnum text-ink-100">{score}</span>
         <span className="text-sm text-ink-500">/ 100</span>
       </div>
       <div className="mt-2.5">

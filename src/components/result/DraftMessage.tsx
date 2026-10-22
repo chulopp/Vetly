@@ -51,13 +51,27 @@ export default function DraftMessage({ offerId, initialDraft }: DraftMessageProp
 
   async function handleCopy() {
     if (!message) return;
+    let success = false;
     try {
       await navigator.clipboard.writeText(message);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 1600);
+      success = true;
     } catch {
-      // clipboard unavailable — the text is still visible and selectable
+      const el = document.createElement('textarea');
+      el.value = message;
+      el.style.position = 'fixed';
+      el.style.opacity = '0';
+      document.body.appendChild(el);
+      el.focus();
+      el.select();
+      try {
+        success = document.execCommand('copy');
+      } finally {
+        document.body.removeChild(el);
+      }
     }
+    void success;
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
   }
 
   return (

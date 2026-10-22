@@ -15,7 +15,7 @@ import {
   tierProximity,
 } from '@/lib/engine';
 import type { AnalysisResult, OfferFlag, OfferInput } from '@/lib/engine/types';
-import { addMyOffer, saveCachedOffer } from '@/lib/myOffers';
+import { addMyOffer } from '@/lib/myOffers';
 import { OfferInputSchema, zodToIssues, type ExtractedFields, type ValidationIssue } from '@/lib/validation/offer';
 import { cn } from '@/lib/utils';
 import {
@@ -308,16 +308,7 @@ export default function EntryCard({ expanded, onExpand }: EntryCardProps = {}) {
 
       if (response.status === 201 && data && typeof (data as { id?: unknown }).id === 'string') {
         const id = (data as { id: string }).id;
-        const analysis = (data as { analysis?: AnalysisResult }).analysis;
         addMyOffer(id);
-        if (analysis) {
-          saveCachedOffer({
-            id,
-            input: payload,
-            analysis,
-            createdAt: new Date().toISOString(),
-          });
-        }
         window.location.assign(`/result/${id}`);
         return; // keep the progress state during the redirect (PRD §3.5.2)
       }
@@ -349,12 +340,7 @@ export default function EntryCard({ expanded, onExpand }: EntryCardProps = {}) {
   return (
     <section
       id="analyze"
-      className={cn(
-        'mx-auto w-full max-w-[700px] transition-all duration-500 ease-out',
-        !isExpanded
-          ? 'pointer-events-none my-0 max-h-0 overflow-hidden opacity-0'
-          : 'my-6 max-h-[3500px] opacity-100 animate-fade-up',
-      )}
+      className="mx-auto my-6 w-full max-w-[700px] transition-all duration-500 ease-out animate-fade-up"
     >
       <div className="glass rounded-[26px] p-5 md:p-7">
         <SmartPasteBox status={paste.status} message={paste.message} onExtract={handleExtract} />

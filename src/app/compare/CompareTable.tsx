@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { ArrowDown, ArrowUp, ArrowUpDown, ChevronLeft, ChevronRight, Plus } from 'lucide-react';
@@ -8,7 +8,7 @@ import { ActionBadge, TierBadge } from '@/components/ui/badges';
 import { formatMoney } from '@/lib/currency';
 import { formatMargin } from '@/lib/engine';
 import type { RecommendAction, RiskTier } from '@/lib/engine/types';
-import { getMyOffers, getCachedOffers, saveCachedOffer } from '@/lib/myOffers';
+import { getMyOffers } from '@/lib/myOffers';
 import type { OfferRecord } from '@/lib/offers/service';
 import { cn } from '@/lib/utils';
 
@@ -37,50 +37,38 @@ const COLUMNS: Array<{ key: SortKey; label: string }> = [
 /**
  * Client-side table for the Compare page (PRD §4.3).
  * Primary: uses server-fetched offers from my_offers cookie.
- * Resilient fallback: if server had no cookie, checks localStorage mirror.
+ * Resilient fallback: if server had no cookie, checks localStorage mirror once.
  * If no offers exist anywhere, shows the designed empty state.
  */
 export function CompareTable({ initialOffers = [] }: { initialOffers?: OfferRecord[] }) {
   const router = useRouter();
-  const [offers, setOffers] = useState<OfferRecord[]>(() => {
-    if (initialOffers.length > 0) return initialOffers;
-    return getCachedOffers();
-  });
+  const [offers, setOffers] = useState<OfferRecord[]>(initialOffers);
   const [sort, setSort] = useState<{ key: SortKey; dir: SortDir }>({ key: 'createdAt', dir: 'desc' });
   const [currentPage, setCurrentPage] = useState(1);
+  const fetchedRef = useRef(false);
 
   useEffect(() => {
-    // Cache any server-provided offers locally
-    for (const off of initialOffers) {
-      saveCachedOffer(off);
-    }
+    setOffers(initialOffers);
+  }, [initialOffers]);
 
-    const localIds = getMyOffers();
-    const currentCached = getCachedOffers();
-    if (offers.length === 0 && currentCached.length > 0) {
-      setOffers(currentCached);
-    }
-
-    if (localIds.length > offers.length || initialOffers.length > offers.length) {
-      fetch(`/api/offers?ids=${encodeURIComponent(localIds.join(','))}`)
-        .then((res) => (res.ok ? res.json() : null))
-        .then((data) => {
-          if (data && Array.isArray(data.offers) && data.offers.length > 0) {
-            setOffers(data.offers);
-            for (const off of data.offers) {
-              saveCachedOffer(off);
+  useEffect(() => {
+    // If server rendered an empty list, but this browser session has saved offer IDs in localStorage,
+    // fetch them once as a client-side recovery fallback without looping.
+    if (initialOffers.length === 0 && !fetchedRef.current) {
+      const localIds = getMyOffers();
+      if (localIds.length > 0) {
+        fetchedRef.current = true;
+        fetch(`/api/offers?ids=${encodeURIComponent(localIds.join(','))}`)
+          .then((res) => (res.ok ? res.json() : null))
+          .then((data) => {
+            if (data && Array.isArray(data.offers) && data.offers.length > 0) {
+              setOffers(data.offers);
             }
-          } else if (initialOffers.length > 0) {
-            setOffers(initialOffers);
-          }
-        })
-        .catch(() => {
-          if (initialOffers.length > 0) setOffers(initialOffers);
-        });
-    } else if (initialOffers.length > 0) {
-      setOffers(initialOffers);
+          })
+          .catch(() => {});
+      }
     }
-  }, [initialOffers, offers.length]);
+  }, [initialOffers]);
 
   const sorted = useMemo(() => {
     const list = [...offers];
@@ -187,8 +175,13 @@ export function CompareTable({ initialOffers = [] }: { initialOffers?: OfferReco
                   }}
                   className="cursor-pointer border-b border-white/5 transition-colors last:border-0 hover:bg-white/[0.04] focus-visible:bg-white/[0.04] focus-visible:outline-none"
                 >
-                  <td className="px-4 py-3.5 tnum text-ink-100">
-                    {formatMoney(offer.input.budget, offer.input.currency)}
+                  <td className="px-4 py-3.5 tnum text-ink-100 font-medium">
+                    <Link
+                      href={`/result/${offer.id}`}
+                      className="block hover:underline"
+                    >
+                      {formatMoney(offer.input.budget, offer.input.currency)}
+                    </Link>
                   </td>
                   <td className="px-4 py-3.5 tnum text-ink-100">
                     {formatMoney(offer.analysis.effectiveHourlyRate, offer.input.currency)}

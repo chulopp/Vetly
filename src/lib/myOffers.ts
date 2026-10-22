@@ -1,7 +1,5 @@
 'use client';
 
-import type { OfferRecord } from '@/lib/offers/service';
-
 /**
  * Client-side localStorage mirror for the offers saved in this browser
  * (PRD v7 §3.1).
@@ -17,7 +15,6 @@ import type { OfferRecord } from '@/lib/offers/service';
  */
 
 const STORAGE_KEY = 'myOffers';
-const CACHE_STORAGE_KEY = 'myOffers_cached_records';
 export const MAX_OFFERS = 50;
 
 function isBrowser(): boolean {
@@ -50,28 +47,4 @@ export function addMyOffer(id: string): void {
 
 export function ownsOffer(id: string): boolean {
   return getMyOffers().includes(id);
-}
-
-export function getCachedOffers(): OfferRecord[] {
-  if (!isBrowser()) return [];
-  try {
-    const raw = localStorage.getItem(CACHE_STORAGE_KEY);
-    const parsed: unknown = raw === null ? [] : JSON.parse(raw);
-    if (!Array.isArray(parsed)) return [];
-    return parsed as OfferRecord[];
-  } catch {
-    return [];
-  }
-}
-
-export function saveCachedOffer(record: OfferRecord): void {
-  if (!isBrowser()) return;
-  try {
-    const existing = getCachedOffers().filter((r) => r.id !== record.id);
-    existing.unshift(record);
-    const trimmed = existing.slice(0, MAX_OFFERS);
-    localStorage.setItem(CACHE_STORAGE_KEY, JSON.stringify(trimmed));
-  } catch {
-    // storage unavailable
-  }
 }

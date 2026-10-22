@@ -15,23 +15,9 @@ export default function HomePage() {
   }, []);
 
   function handleStart() {
-    if (!expanded) {
-      setExpanded(true);
-      // EntryCard expands with a 500ms CSS transition.
-      // Trigger an initial smooth scroll early, and a final scroll after the transition completes
-      // so the viewport reliably glides all the way down to the bottom.
-      setTimeout(() => {
-        window.scrollTo({
-          top: document.documentElement.scrollHeight,
-          behavior: 'smooth',
-        });
-      }, 150);
-      setTimeout(() => {
-        window.scrollTo({
-          top: document.documentElement.scrollHeight,
-          behavior: 'smooth',
-        });
-      }, 550);
+    const el = document.getElementById('analyze');
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
     } else {
       window.scrollTo({
         top: document.documentElement.scrollHeight,
