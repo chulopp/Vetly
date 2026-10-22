@@ -49,7 +49,7 @@ export const PRESETS: PresetDefinition[] = [
       budget: 18000,
       currency: 'USD',
       platformFeePercent: 0,
-      estimatedHours: 100,
+      estimatedHours: 60,
       depositPercent: 10,
       paymentTermsDays: 90,
       allowedRevisions: 2,
