@@ -94,12 +94,12 @@ export default function OwnerActions({ offerId, isOwner }: OwnerActionsProps) {
             }
           }}
           data-share-url={`/share/${offerId}`}
-          aria-label={copied ? 'Result link copied' : 'Share analysis result'}
+          aria-label={copied ? 'Result link copied' : 'Copy share link'}
           className="flex items-center justify-center gap-1.5 rounded-xl border border-white/15 bg-white/[0.03] px-3 py-2.5 text-xs font-medium text-ink-300 transition hover:border-white/30 hover:text-ink-100"
         >
           {copied ? <Check className="size-3.5 text-accept" /> : <Share2 className="size-3.5" />}
           <span role="status" aria-live="polite">
-            {copied ? 'Result link copied' : 'Share analysis result'}
+            {copied ? 'Result link copied' : 'Copy share link'}
           </span>
         </a>
         <Link

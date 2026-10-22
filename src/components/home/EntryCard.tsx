@@ -309,7 +309,7 @@ export default function EntryCard({ expanded, onExpand }: EntryCardProps = {}) {
       if (response.status === 201 && data && typeof (data as { id?: unknown }).id === 'string') {
         const id = (data as { id: string }).id;
         addMyOffer(id);
-        router.push(`/result/${id}`);
+        window.location.assign(`/result/${id}`);
         return; // keep the progress state during the redirect (PRD §3.5.2)
       }
 
