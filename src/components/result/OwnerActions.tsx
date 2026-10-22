@@ -48,7 +48,7 @@ export default function OwnerActions({ offerId, isOwner }: OwnerActionsProps) {
     void success;
     if (copyTimeoutRef.current) clearTimeout(copyTimeoutRef.current);
     setCopied(true);
-    copyTimeoutRef.current = setTimeout(() => setCopied(false), 2500);
+    copyTimeoutRef.current = setTimeout(() => setCopied(false), 10000);
   }
 
   const isClientShare =
@@ -125,6 +125,20 @@ export default function OwnerActions({ offerId, isOwner }: OwnerActionsProps) {
           New analysis
         </Link>
       </div>
+
+      {copied && (
+        <div className="mt-3 flex items-center gap-2 rounded-xl border border-white/10 bg-white/[0.02] p-1.5">
+          <input
+            type="text"
+            readOnly
+            value={typeof window !== 'undefined' ? `${window.location.origin}/share/${offerId}` : `/share/${offerId}`}
+            data-testid="share-link-input"
+            aria-label="Copied URL"
+            className="min-w-0 flex-1 bg-transparent px-2 text-[11px] text-ink-300 font-mono select-all focus:outline-none"
+            onClick={(e) => (e.target as HTMLInputElement).select()}
+          />
+        </div>
+      )}
     </div>
   );
 }
