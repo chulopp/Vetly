@@ -1,4 +1,4 @@
-import { index, integer, jsonb, numeric, pgTable, timestamp, varchar } from 'drizzle-orm/pg-core';
+import { index, integer, jsonb, numeric, pgTable, text, timestamp, varchar } from 'drizzle-orm/pg-core';
 import type { AnalysisResult, OfferFlag } from '@/lib/engine/types';
 
 /**
@@ -33,6 +33,7 @@ export const offers = pgTable(
     riskTier: varchar('risk_tier', { length: 8 }).notNull(), // LOW | MEDIUM | HIGH
     recommendAction: varchar('recommend_action', { length: 10 }).notNull(), // ACCEPT | NEGOTIATE | REJECT
     analysis: jsonb('analysis').$type<AnalysisResult>().notNull(),
+    draftMessage: text('draft_message'),
 
     createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
   },

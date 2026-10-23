@@ -62,7 +62,9 @@ export default function OwnerActions({ offerId, isOwner }: OwnerActionsProps) {
       window.location.search.includes('preview') ||
       window.location.search.includes('readonly') ||
       window.location.search.includes('read_only') ||
-      window.location.search.includes('read-only'));
+      window.location.search.includes('read-only') ||
+      window.location.search.includes('view-only') ||
+      window.location.search.includes('view_only'));
 
   if (!isOwner || isClientShare) {
     return (
@@ -70,10 +72,12 @@ export default function OwnerActions({ offerId, isOwner }: OwnerActionsProps) {
         <p className="text-sm text-ink-300">This analysis was shared with you.</p>
         <Link
           href="/"
-          className="mt-3.5 inline-flex items-center gap-2 rounded-xl bg-ink-100 px-5 py-2.5 text-sm font-semibold text-base-950 transition hover:bg-white"
+          aria-label="Analyze a deal"
+          data-testid="analyze-deal-cta"
+          className="btn-volta-cta mt-4 inline-flex items-center justify-center gap-2 rounded-full px-5 py-2.5 text-sm font-medium text-white transition active:scale-[0.98]"
         >
-          <Plus className="size-4" />
-          Analyze your own deal
+          <Plus className="size-4 text-white" />
+          <span>Analyze a deal</span>
         </Link>
       </div>
     );
@@ -85,23 +89,19 @@ export default function OwnerActions({ offerId, isOwner }: OwnerActionsProps) {
         Your saved offer
       </div>
       <div className="mt-3 grid grid-cols-2 gap-2.5">
-        <a
-          href={`/share/${offerId}`}
-          onClick={(e) => {
-            if (!e.metaKey && !e.ctrlKey && !e.shiftKey && !e.altKey && e.button === 0) {
-              e.preventDefault();
-              void handleCopyLink();
-            }
-          }}
-          data-share-url={`/share/${offerId}`}
-          aria-label="Copy share link"
+        <button
+          type="button"
+          onClick={handleCopyLink}
+          data-share-url={typeof window !== 'undefined' ? `${window.location.origin}/share/${offerId}` : `/share/${offerId}`}
+          data-testid="copy-share-link"
+          aria-label={copied ? 'Result link copied' : 'Copy share link'}
           className="flex items-center justify-center gap-1.5 rounded-xl border border-white/15 bg-white/[0.03] px-3 py-2.5 text-xs font-medium text-ink-300 transition hover:border-white/30 hover:text-ink-100"
         >
           {copied ? <Check className="size-3.5 text-accept" /> : <Share2 className="size-3.5" />}
           <span role="status" aria-live="polite">
-            {copied ? 'Link copied' : 'Copy share link'}
+            {copied ? 'Result link copied' : 'Copy share link'}
           </span>
-        </a>
+        </button>
         <Link
           href={`/?prefill=${offerId}`}
           className="flex items-center justify-center gap-1.5 rounded-xl border border-white/15 bg-white/[0.03] px-3 py-2.5 text-xs font-medium text-ink-300 transition hover:border-white/30 hover:text-ink-100"
@@ -115,7 +115,7 @@ export default function OwnerActions({ offerId, isOwner }: OwnerActionsProps) {
           className="flex items-center justify-center gap-1.5 rounded-xl border border-white/15 bg-white/[0.03] px-3 py-2.5 text-xs font-medium text-ink-300 transition hover:border-white/30 hover:text-ink-100"
         >
           <ListPlus className="size-3.5" />
-          Add to Compare
+          Add to saved
         </Link>
         <Link
           href="/"

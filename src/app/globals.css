@@ -26,7 +26,7 @@
   --color-negotiate: #f59e0b;
   --color-reject: #ef4444;
 
-  --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
     "Helvetica Neue", Arial, sans-serif;
 }
 
@@ -34,17 +34,30 @@ html {
   color-scheme: dark;
 }
 
-/* Fixed aurora backdrop — glass needs something to refract */
-body::before {
-  content: "";
+/* Volta-style atmospheric aurora backdrop — with central emerald glow */
+.bg-aurora-fixed {
   position: fixed;
   inset: 0;
-  z-index: -1;
+  z-index: -50;
   pointer-events: none;
-  background:
-    radial-gradient(640px 420px at 12% -5%, rgba(56, 89, 219, 0.14), transparent 65%),
-    radial-gradient(760px 520px at 88% 8%, rgba(147, 51, 234, 0.11), transparent 65%),
-    radial-gradient(900px 640px at 50% 110%, rgba(14, 165, 233, 0.09), transparent 60%);
+  background-color: #0c0e14;
+  background-image:
+    radial-gradient(750px 480px at 50% 28%, rgba(61, 220, 132, 0.22), transparent 70%),
+    radial-gradient(850px 550px at 12% 12%, rgba(42, 56, 96, 0.9), transparent 70%),
+    radial-gradient(750px 500px at 0% 38%, rgba(35, 45, 78, 0.8), transparent 65%),
+    radial-gradient(900px 600px at 88% 18%, rgba(58, 42, 72, 0.88), transparent 70%),
+    radial-gradient(750px 480px at 100% 45%, rgba(50, 36, 62, 0.75), transparent 65%),
+    radial-gradient(750px 420px at 50% 0%, rgba(55, 65, 98, 0.7), transparent 65%),
+    radial-gradient(1000px 600px at 50% 100%, rgba(30, 34, 48, 0.5), transparent 70%);
+  background-repeat: no-repeat;
+  contain: strict;
+  isolation: isolate;
+  transform: translateZ(0);
+}
+
+body {
+  background-color: #0c0e14;
+  min-height: 100dvh;
 }
 
 /* ── Glass materials (manual CSS approach — locked plan decision #3) ── */
@@ -67,6 +80,43 @@ body::before {
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.1),
     0 14px 44px rgba(0, 0, 0, 0.45);
+}
+
+/* ── Volta-inspired window / card ── */
+.card-volta {
+  background: rgba(14, 16, 23, 0.88);
+  -webkit-backdrop-filter: blur(24px) saturate(160%);
+  backdrop-filter: blur(24px) saturate(160%);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 26px;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    0 30px 60px -20px rgba(0, 0, 0, 0.8),
+    0 0 0 1px rgba(255, 255, 255, 0.03);
+}
+
+/* ── Volta-inspired CTA Button (metallic semi-translucent pill) ── */
+.btn-volta-cta {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.14) 0%, rgba(255, 255, 255, 0.05) 100%), #141721;
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.22),
+    0 4px 16px rgba(0, 0, 0, 0.4);
+  color: #ffffff;
+  transition:
+    background 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+    border-color 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+    box-shadow 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.btn-volta-cta:hover {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0.08) 100%), #181d2a;
+  border-color: rgba(255, 255, 255, 0.28);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.28),
+    0 6px 22px rgba(0, 0, 0, 0.5);
 }
 
 /* Solid high-contrast panel — where the numbers live. Never glass. */
@@ -124,9 +174,42 @@ body::before {
   animation: reveal-badge 0.5s cubic-bezier(0.22, 1, 0.36, 1) 0.08s both;
 }
 
+/* Shimmer beam across Introducing pill */
+@keyframes pill-shimmer-sweep {
+  0% {
+    transform: translateX(-150%) skewX(-20deg);
+  }
+  35%, 100% {
+    transform: translateX(250%) skewX(-20deg);
+  }
+}
+
+.animate-pill-shimmer {
+  animation: pill-shimmer-sweep 4s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+/* Smooth sweeping light shimmer across CTA button: enters left, exits right, pauses offscreen, loops */
+@keyframes btn-shimmer-sweep {
+  0% {
+    transform: translateX(-150%) skewX(-20deg);
+  }
+  42% {
+    transform: translateX(250%) skewX(-20deg);
+  }
+  100% {
+    transform: translateX(250%) skewX(-20deg);
+  }
+}
+
+.animate-btn-shimmer {
+  animation: btn-shimmer-sweep 5.5s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .animate-fade-up,
-  .animate-reveal-badge {
+  .animate-reveal-badge,
+  .animate-pill-shimmer,
+  .animate-btn-shimmer {
     animation: none;
   }
 }
@@ -138,6 +221,10 @@ body::before {
     backdrop-filter: blur(12px) saturate(140%);
   }
   .glass-strong {
+    -webkit-backdrop-filter: blur(16px) saturate(150%);
+    backdrop-filter: blur(16px) saturate(150%);
+  }
+  .card-volta {
     -webkit-backdrop-filter: blur(16px) saturate(150%);
     backdrop-filter: blur(16px) saturate(150%);
   }

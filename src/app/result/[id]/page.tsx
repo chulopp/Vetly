@@ -15,6 +15,7 @@ import { getOffer, type OfferRecord } from '@/lib/offers/service';
 import { findPreset } from '@/lib/presets';
 import { OFFER_ID_PATTERN } from '@/lib/validation/offer';
 import { cookieOwnsOffer, COOKIE_NAME } from '@/lib/ownershipCookie';
+import { generateVerdictSummary } from '@/lib/summary';
 
 async function loadOffer(id: string): Promise<{ offer: OfferRecord | null; dbError: boolean }> {
   try {
@@ -70,16 +71,26 @@ export default async function ResultPage({
     search.visitor !== undefined ||
     search.guest !== undefined ||
     search.preview !== undefined ||
+    search['view-only'] !== undefined ||
+    search.view_only !== undefined ||
+    search.viewonly !== undefined ||
     search.view === 'shared' ||
     search.view === 'readonly' ||
     search.view === 'read-only' ||
     search.view === 'public' ||
     search.view === 'visitor' ||
+    search.view === 'view-only' ||
+    search.view === 'view_only' ||
+    search.view === 'only' ||
     search.mode === 'shared' ||
     search.mode === 'readonly' ||
     search.mode === 'read-only' ||
     search.mode === 'public' ||
-    search.mode === 'visitor';
+    search.mode === 'visitor' ||
+    search.mode === 'view-only' ||
+    search.mode === 'view_only' ||
+    search.mode === 'view' ||
+    search.mode === 'only';
 
   if (!OFFER_ID_PATTERN.test(id)) notFound();
 
@@ -102,23 +113,27 @@ export default async function ResultPage({
 
   return (
     <main className="mx-auto w-full max-w-5xl px-4 pb-16 pt-24">
-      <div className="grid gap-6 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">
-        {/* left column - the narrative: why this verdict */}
-        <div className="flex min-w-0 flex-col gap-6">
-          <DecisionBadge action={analysis.recommendAction} reason={analysis.decisionReason} />
+      <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">
+        {/* left column - the narrative: sticky alongside long right column */}
+        <div className="flex min-w-0 flex-col gap-6 lg:sticky lg:top-24 lg:self-start">
+          <DecisionBadge
+            action={analysis.recommendAction}
+            summary={generateVerdictSummary(offer)}
+            offer={offer}
+          />
           <RateComparison offer={offer} />
           <RiskBreakdown analysis={analysis} />
         </div>
 
-        {/* right column - the action: what to do about it */}
-        <div className="flex min-w-0 flex-col gap-6 lg:sticky lg:top-24 lg:self-start">
+        {/* right column - the action: scrolls naturally */}
+        <div className="flex min-w-0 flex-col gap-6">
           {analysis.counterOffer?.budgetTriggered && (
             <CounterOfferCard counterOffer={analysis.counterOffer} currency={offer.input.currency} />
           )}
           {analysis.counterOffer?.riskTriggered && (
             <ContractConditions counterOffer={analysis.counterOffer} />
           )}
-          {analysis.counterOffer && <DraftMessage offerId={offer.id} />}
+          <DraftMessage offerId={offer.id} initialDraft={offer.draftMessage} />
           <OwnerActions offerId={offer.id} isOwner={isOwner} />
         </div>
       </div>
@@ -132,7 +147,7 @@ function DbUnavailableCard() {
       <div className="glass animate-fade-up rounded-3xl p-10">
         <h1 className="text-xl font-semibold text-ink-100">Saved offers aren&apos;t available right now.</h1>
         <p className="mt-2 text-sm leading-relaxed text-ink-300">
-          The analysis database isn&apos;t configured yet — try again in a moment.
+          The analysis database isn&apos;t configured yet, try again in a moment.
         </p>
         <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
           <Link

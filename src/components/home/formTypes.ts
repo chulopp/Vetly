@@ -77,7 +77,9 @@ export const EMPTY_FORM: FormState = {
 export function parseNumberInput(raw: string): number | null {
   const trimmed = raw.trim();
   if (trimmed === '') return null;
-  const value = Number(trimmed);
+  const sanitized = trimmed.replace(/[%$€£,]/g, '').trim();
+  if (sanitized === '') return null;
+  const value = Number(sanitized);
   return Number.isFinite(value) ? value : null;
 }
 

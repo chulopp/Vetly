@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { ChevronDown } from 'lucide-react';
+import { CaretDown } from '@phosphor-icons/react';
 import LiveRiskGauge from '@/components/home/LiveRiskGauge';
 import OfferForm from '@/components/home/OfferForm';
 import PresetChips from '@/components/home/PresetChips';
@@ -14,7 +14,7 @@ import {
   riskTier,
   tierProximity,
 } from '@/lib/engine';
-import type { OfferFlag, OfferInput } from '@/lib/engine/types';
+import type { AnalysisResult, OfferFlag, OfferInput } from '@/lib/engine/types';
 import { addMyOffer } from '@/lib/myOffers';
 import { OfferInputSchema, zodToIssues, type ExtractedFields, type ValidationIssue } from '@/lib/validation/offer';
 import { cn } from '@/lib/utils';
@@ -31,13 +31,18 @@ import {
   type FormState,
 } from './formTypes';
 
+interface EntryCardProps {
+  expanded?: boolean;
+  onExpand?: () => void;
+}
+
 /**
  * The entry card (PRD §4.3 Home): Smart Paste as the primary element at the
  * top, preset chips below it, the manual form behind a collapsed accordion,
  * and the live risk gauge as a second column (desktop) / above the submit
  * button (mobile) once a risk-relevant field is touched.
  */
-export default function EntryCard() {
+export default function EntryCard({ expanded, onExpand }: EntryCardProps = {}) {
   const router = useRouter();
 
   const [form, setForm] = useState<FormState>(EMPTY_FORM);
@@ -46,6 +51,7 @@ export default function EntryCard() {
   const [touched, setTouched] = useState<Partial<Record<FormFieldKey, boolean>>>({});
   const [serverFieldErrors, setServerFieldErrors] = useState<Partial<Record<FormFieldKey, string>>>({});
   const [formOpen, setFormOpen] = useState(false);
+  const [internalExpanded, setInternalExpanded] = useState(false);
   const [paste, setPaste] = useState<{ status: PasteStatus; message: string | null }>({
     status: 'idle',
     message: null,
@@ -53,12 +59,16 @@ export default function EntryCard() {
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
 
+  const isExpanded = expanded ?? internalExpanded;
+
   // ── Duplicate & edit: /?prefill=<id> populates the form (PRD §4.2 Step 4) ──
   // ── Intake parameter: /?intake=open expands the form (from compare empty-state CTA) ──
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     if (params.get('intake') === 'open') {
       setFormOpen(true);
+      setInternalExpanded(true);
+      if (onExpand) onExpand();
     }
     const prefillId = params.get('prefill');
     if (!prefillId) return;
@@ -69,6 +79,8 @@ export default function EntryCard() {
         if (cancelled || !data?.offer?.input) return;
         setForm(inputToForm(data.offer.input as OfferInput));
         setFormOpen(true);
+        setInternalExpanded(true);
+        if (onExpand) onExpand();
       })
       .catch(() => {
         // a broken prefill just leaves the empty form — never blocks the flow
@@ -76,7 +88,7 @@ export default function EntryCard() {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [onExpand]);
 
   // ── Field-level validation (same Zod schema the API uses) ──
 
@@ -163,6 +175,8 @@ export default function EntryCard() {
     setServerFieldErrors({});
     setSubmitError(null);
     setFormOpen(true);
+    setInternalExpanded(true);
+    if (onExpand) onExpand();
   }
 
   function applyExtracted(fields: ExtractedFields) {
@@ -218,6 +232,8 @@ export default function EntryCard() {
         const resolved = Object.values(fields).filter((value) => value !== null).length;
         applyExtracted(fields);
         setFormOpen(true);
+        setInternalExpanded(true);
+        if (onExpand) onExpand();
 
         // Build a message that calls out any still-empty required fields so the
         // user (and TestSprite) knows exactly what still needs filling.
@@ -227,25 +243,29 @@ export default function EntryCard() {
         });
         const missingNote =
           stillEmpty.length > 0
-            ? ` — ${FIELD_LABELS[stillEmpty[0] as FormFieldKey]}${stillEmpty.length > 1 ? ` and ${stillEmpty.length - 1} other field${stillEmpty.length > 2 ? 's' : ''}` : ''} still need${stillEmpty.length === 1 ? 's' : ''} your input.`
+            ? ` ${FIELD_LABELS[stillEmpty[0] as FormFieldKey]}${stillEmpty.length > 1 ? ` and ${stillEmpty.length - 1} other field${stillEmpty.length > 2 ? 's' : ''}` : ''} still need${stillEmpty.length === 1 ? 's' : ''} your input.`
             : '';
 
         setPaste(
           resolved > 0
             ? {
                 status: 'success',
-                message: `Extracted ${resolved} of 8 fields — review and adjust below, then analyze.${missingNote}`,
+                message: `Extracted ${resolved} of 8 fields. Review and adjust below, then analyze.${missingNote}`,
               }
-            : { status: 'error', message: 'No offer details found in that message — fill the form manually.' },
+            : { status: 'error', message: 'No offer details found in that message. Fill the form manually.' },
         );
       } else {
         // graceful fallback: manual entry, never blocks the core flow (PRD §3.3)
         setFormOpen(true);
-        setPaste({ status: 'error', message: "Couldn't extract from that message — fill the form manually." });
+        setInternalExpanded(true);
+        if (onExpand) onExpand();
+        setPaste({ status: 'error', message: "Couldn't extract from that message. Fill the form manually." });
       }
     } catch {
       setFormOpen(true);
-      setPaste({ status: 'error', message: "Couldn't extract — check your connection and fill the form manually." });
+      setInternalExpanded(true);
+      if (onExpand) onExpand();
+      setPaste({ status: 'error', message: "Couldn't extract. Check your connection and fill the form manually." });
     }
   }
 
@@ -289,7 +309,7 @@ export default function EntryCard() {
       if (response.status === 201 && data && typeof (data as { id?: unknown }).id === 'string') {
         const id = (data as { id: string }).id;
         addMyOffer(id);
-        router.push(`/result/${id}`);
+        window.location.assign(`/result/${id}`);
         return; // keep the progress state during the redirect (PRD §3.5.2)
       }
 
@@ -312,16 +332,17 @@ export default function EntryCard() {
       }
       setSubmitting(false);
     } catch {
-      setSubmitError('Could not reach the server — check your connection and try again.');
+      setSubmitError('Could not reach the server. Check your connection and try again.');
       setSubmitting(false);
     }
   }
 
-  // ── Render ──
-
   return (
-    <section id="analyze" className="mx-auto w-full max-w-[700px]">
-      <div className="glass-strong rounded-3xl p-5 md:p-7">
+    <section
+      id="analyze"
+      className="mx-auto my-6 w-full max-w-[700px] transition-all duration-500 ease-out animate-fade-up"
+    >
+      <div className="glass rounded-[26px] p-5 md:p-7">
         <SmartPasteBox status={paste.status} message={paste.message} onExtract={handleExtract} />
 
         <PresetChips className="mt-5" onApply={applyPreset} activeId={activePresetId} />
@@ -333,22 +354,20 @@ export default function EntryCard() {
           className="mt-5 flex items-center gap-1.5 text-sm font-medium text-ink-300 transition-colors hover:text-ink-100"
         >
           Or enter manually
-          <ChevronDown className={cn('size-4 transition-transform duration-300', formOpen && 'rotate-180')} />
+          <CaretDown className={cn('size-4 transition-transform duration-300', formOpen && 'rotate-180')} weight="light" />
         </button>
 
         {formOpen && (
-          <div
+          <form
+            id="offer-form"
+            onSubmit={handleSubmit}
+            noValidate
             className={cn(
               'mt-5 grid items-start gap-6',
               gaugeVisible && 'lg:grid-cols-[minmax(0,1fr)_280px]',
             )}
           >
-            <form
-              id="offer-form"
-              onSubmit={handleSubmit}
-              noValidate
-              className="grid grid-cols-1 gap-4 sm:grid-cols-2"
-            >
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <OfferForm
                 key={`${activePresetId ?? 'manual'}-${presetRevision}`}
                 form={form}
@@ -357,7 +376,7 @@ export default function EntryCard() {
                 onFieldBlur={handleFieldBlur}
                 onFlagToggle={handleFlagToggle}
               />
-            </form>
+            </div>
 
             {riskView && (
               <aside className="animate-fade-up lg:sticky lg:top-24 lg:self-start">
@@ -365,16 +384,15 @@ export default function EntryCard() {
               </aside>
             )}
 
-            <div className="animate-fade-up">
+            <div className={cn('animate-fade-up', gaugeVisible && 'lg:col-span-2')}>
               <button
-                form="offer-form"
                 type="submit"
                 disabled={submitting}
-                className="flex w-full items-center justify-center gap-2 rounded-xl bg-ink-100 px-5 py-3 text-sm font-semibold text-base-950 transition hover:bg-white disabled:cursor-wait disabled:opacity-60"
+                className="btn-volta-cta flex w-full items-center justify-center gap-2 rounded-xl px-5 py-3 text-sm font-semibold text-white transition active:scale-[0.98] disabled:cursor-wait disabled:opacity-60"
               >
                 {submitting ? (
                   <>
-                    <Spinner className="size-3.5" />
+                    <Spinner className="size-3.5 text-white" />
                     Analyzing your offer…
                   </>
                 ) : (
@@ -383,7 +401,7 @@ export default function EntryCard() {
               </button>
               {submitError && <p className="mt-2 text-xs text-reject">{submitError}</p>}
             </div>
-          </div>
+          </form>
         )}
       </div>
     </section>

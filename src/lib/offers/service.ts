@@ -10,6 +10,7 @@ export interface OfferRecord {
   id: string;
   input: OfferInput;
   analysis: AnalysisResult;
+  draftMessage?: string | null;
   createdAt: string;
 }
 
@@ -61,8 +62,14 @@ function toRecord(row: OfferRow): OfferRecord {
       flags: row.flags ?? [],
     },
     analysis: row.analysis,
+    draftMessage: row.draftMessage ?? null,
     createdAt: row.createdAt.toISOString(),
   };
+}
+
+export async function saveDraftMessage(id: string, message: string): Promise<void> {
+  const db = getDb();
+  await db.update(offers).set({ draftMessage: message }).where(eq(offers.id, id));
 }
 
 export async function getOffer(id: string): Promise<OfferRecord | null> {

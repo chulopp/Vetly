@@ -54,6 +54,7 @@ export const OfferInputSchema = z.object({
     .number({ invalid_type_error: 'Allowed revisions must be a number.' })
     .int('Allowed revisions must be a whole number of 0 or more.')
     .min(0, 'Allowed revisions must be 0 or more.')
+    .max(20, 'Allowed revisions must be 20 or fewer.')
     .default(0),
 
   targetRate: z

@@ -1,9 +1,9 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { ArrowDown, ArrowUp, ArrowUpDown, Plus } from 'lucide-react';
+import { ArrowDown, ArrowUp, ArrowUpDown, ChevronLeft, ChevronRight, Plus } from 'lucide-react';
 import { ActionBadge, TierBadge } from '@/components/ui/badges';
 import { formatMoney } from '@/lib/currency';
 import { formatMargin } from '@/lib/engine';
@@ -11,6 +11,8 @@ import type { RecommendAction, RiskTier } from '@/lib/engine/types';
 import { getMyOffers } from '@/lib/myOffers';
 import type { OfferRecord } from '@/lib/offers/service';
 import { cn } from '@/lib/utils';
+
+const PAGE_SIZE = 10;
 
 type SortKey =
   | 'createdAt'
@@ -35,31 +37,36 @@ const COLUMNS: Array<{ key: SortKey; label: string }> = [
 /**
  * Client-side table for the Compare page (PRD §4.3).
  * Primary: uses server-fetched offers from my_offers cookie.
- * Resilient fallback: if server had no cookie, checks localStorage mirror.
+ * Resilient fallback: if server had no cookie, checks localStorage mirror once.
  * If no offers exist anywhere, shows the designed empty state.
  */
 export function CompareTable({ initialOffers = [] }: { initialOffers?: OfferRecord[] }) {
   const router = useRouter();
   const [offers, setOffers] = useState<OfferRecord[]>(initialOffers);
   const [sort, setSort] = useState<{ key: SortKey; dir: SortDir }>({ key: 'createdAt', dir: 'desc' });
+  const [currentPage, setCurrentPage] = useState(1);
+  const fetchedRef = useRef(false);
 
   useEffect(() => {
-    const localIds = getMyOffers();
-    if (localIds.length > initialOffers.length) {
-      fetch(`/api/offers?ids=${encodeURIComponent(localIds.join(','))}`)
-        .then((res) => (res.ok ? res.json() : null))
-        .then((data) => {
-          if (data && Array.isArray(data.offers) && data.offers.length > initialOffers.length) {
-            setOffers(data.offers);
-          } else if (initialOffers.length > 0) {
-            setOffers(initialOffers);
-          }
-        })
-        .catch(() => {
-          if (initialOffers.length > 0) setOffers(initialOffers);
-        });
-    } else if (initialOffers.length > 0) {
-      setOffers(initialOffers);
+    setOffers(initialOffers);
+  }, [initialOffers]);
+
+  useEffect(() => {
+    // If server rendered an empty list, but this browser session has saved offer IDs in localStorage,
+    // fetch them once as a client-side recovery fallback without looping.
+    if (initialOffers.length === 0 && !fetchedRef.current) {
+      const localIds = getMyOffers();
+      if (localIds.length > 0) {
+        fetchedRef.current = true;
+        fetch(`/api/offers?ids=${encodeURIComponent(localIds.join(','))}`)
+          .then((res) => (res.ok ? res.json() : null))
+          .then((data) => {
+            if (data && Array.isArray(data.offers) && data.offers.length > 0) {
+              setOffers(data.offers);
+            }
+          })
+          .catch(() => {});
+      }
     }
   }, [initialOffers]);
 
@@ -91,7 +98,14 @@ export function CompareTable({ initialOffers = [] }: { initialOffers?: OfferReco
         ? { key, dir: prev.dir === 'asc' ? 'desc' : 'asc' }
         : { key, dir: key === 'createdAt' ? 'desc' : 'asc' },
     );
+    setCurrentPage(1);
   }
+
+  const totalPages = Math.max(1, Math.ceil(sorted.length / PAGE_SIZE));
+  const safePage = Math.min(Math.max(1, currentPage), totalPages);
+  const startIndex = (safePage - 1) * PAGE_SIZE;
+  const endIndex = Math.min(startIndex + PAGE_SIZE, sorted.length);
+  const paginatedOffers = sorted.slice(startIndex, endIndex);
 
   if (offers.length === 0) {
     return (
@@ -100,15 +114,15 @@ export function CompareTable({ initialOffers = [] }: { initialOffers?: OfferReco
         <img src="/vetly-icon.png" alt="" className="h-14 w-auto" />
         <h2 className="mt-5 text-lg font-semibold text-ink-100">No saved offers yet</h2>
         <p className="mt-2 text-sm leading-relaxed text-ink-300">
-          Analyze your first project offer and it&apos;ll show up here — ready to compare side
+          Analyze your first project offer and it&apos;ll show up here, ready to compare side
           by side.
         </p>
         <Link
           href="/?intake=open"
-          className="mt-6 inline-flex items-center gap-2 rounded-xl bg-ink-100 px-5 py-2.5 text-sm font-semibold text-base-950 transition hover:bg-white"
+          className="btn-volta-cta mt-6 inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-medium text-white active:scale-[0.98]"
         >
-          <Plus className="size-4" />
-          Analyze your first offer
+          <Plus className="size-4 text-white" />
+          <span>Analyze your first offer</span>
         </Link>
         <Link
           href="/compare?sample=true"
@@ -120,18 +134,10 @@ export function CompareTable({ initialOffers = [] }: { initialOffers?: OfferReco
     );
   }
 
-  const currencies = new Set(offers.map((offer) => offer.input.currency));
-  const mixedCurrencies = currencies.size > 1;
-
   return (
     <>
-      {mixedCurrencies && (
-        <p className="mt-5 text-xs text-ink-500">
-          Each amount is shown in its offer&apos;s native currency.
-        </p>
-      )}
-      <div className="glass mt-4 overflow-hidden rounded-2xl">
-        <div className="overflow-x-auto">
+      <div className="glass mt-6 overflow-hidden rounded-2xl">
+        <div className="overflow-x-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
           <table className="w-full min-w-[560px] text-sm">
             <thead>
               <tr className="border-b border-white/10">
@@ -159,7 +165,7 @@ export function CompareTable({ initialOffers = [] }: { initialOffers?: OfferReco
               </tr>
             </thead>
             <tbody>
-              {sorted.map((offer) => (
+              {paginatedOffers.map((offer) => (
                 <tr
                   key={offer.id}
                   tabIndex={0}
@@ -169,8 +175,13 @@ export function CompareTable({ initialOffers = [] }: { initialOffers?: OfferReco
                   }}
                   className="cursor-pointer border-b border-white/5 transition-colors last:border-0 hover:bg-white/[0.04] focus-visible:bg-white/[0.04] focus-visible:outline-none"
                 >
-                  <td className="px-4 py-3.5 tnum text-ink-100">
-                    {formatMoney(offer.input.budget, offer.input.currency)}
+                  <td className="px-4 py-3.5 tnum text-ink-100 font-medium">
+                    <Link
+                      href={`/result/${offer.id}`}
+                      className="block hover:underline"
+                    >
+                      {formatMoney(offer.input.budget, offer.input.currency)}
+                    </Link>
                   </td>
                   <td className="px-4 py-3.5 tnum text-ink-100">
                     {formatMoney(offer.analysis.effectiveHourlyRate, offer.input.currency)}
@@ -183,10 +194,10 @@ export function CompareTable({ initialOffers = [] }: { initialOffers?: OfferReco
                   >
                     {formatMargin(offer.analysis.profitabilityMargin)}%
                   </td>
-                  <td className="px-4 py-3.5">
+                  <td className="px-4 py-3.5 whitespace-nowrap">
                     <TierBadge tier={offer.analysis.riskTier} />
                   </td>
-                  <td className="px-4 py-3.5">
+                  <td className="px-4 py-3.5 whitespace-nowrap">
                     <ActionBadge action={offer.analysis.recommendAction} />
                   </td>
                 </tr>
@@ -195,6 +206,60 @@ export function CompareTable({ initialOffers = [] }: { initialOffers?: OfferReco
           </table>
         </div>
       </div>
+
+      {sorted.length > PAGE_SIZE && (
+        <div className="mt-4 flex flex-wrap items-center justify-between gap-3 px-1 text-xs">
+          <p className="text-ink-500">
+            Showing <span className="tnum">{startIndex + 1}</span>–
+            <span className="tnum">{endIndex}</span> of{' '}
+            <span className="tnum">{sorted.length}</span> offers
+          </p>
+
+          <div className="flex items-center gap-1.5">
+            <button
+              type="button"
+              onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+              disabled={safePage === 1}
+              className="inline-flex items-center gap-1 rounded-lg px-2 py-1 text-ink-400 transition-colors hover:bg-white/[0.08] hover:text-white disabled:pointer-events-none disabled:opacity-25"
+              aria-label="Previous page"
+            >
+              <ChevronLeft className="size-3.5" />
+              <span>Prev</span>
+            </button>
+
+            <div className="flex items-center gap-1">
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map((pageNum) => (
+                <button
+                  key={pageNum}
+                  type="button"
+                  onClick={() => setCurrentPage(pageNum)}
+                  className={cn(
+                    'h-7 min-w-7 rounded-lg px-2 text-xs transition-colors tnum',
+                    safePage === pageNum
+                      ? 'bg-white/15 font-semibold text-white shadow-sm'
+                      : 'text-ink-400 hover:bg-white/[0.06] hover:text-ink-200',
+                  )}
+                  aria-current={safePage === pageNum ? 'page' : undefined}
+                >
+                  {pageNum}
+                </button>
+              ))}
+            </div>
+
+            <button
+              type="button"
+              onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+              disabled={safePage === totalPages}
+              className="inline-flex items-center gap-1 rounded-lg px-2 py-1 text-ink-400 transition-colors hover:bg-white/[0.08] hover:text-white disabled:pointer-events-none disabled:opacity-25"
+              aria-label="Next page"
+            >
+              <span>Next</span>
+              <ChevronRight className="size-3.5" />
+            </button>
+          </div>
+        </div>
+      )}
+
       <p className="mt-3 text-xs text-ink-500">Click a row to open the full analysis.</p>
     </>
   );

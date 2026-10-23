@@ -2,7 +2,7 @@ import { Check } from 'lucide-react';
 import type { CounterOffer } from '@/lib/engine/types';
 
 const FALLBACK_LINE =
-  'Risk here comes from payment timing — secure a written agreement and consider milestone payments before starting.';
+  'Risk here comes from payment timing. Secure a written agreement and consider milestone payments before starting.';
 
 /**
  * Contract conditions (PRD §4.3): the checklist of terms to require, rendered
@@ -14,7 +14,7 @@ export default function ContractConditions({ counterOffer }: { counterOffer: Cou
 
   return (
     <div className="glass animate-fade-up rounded-2xl p-5">
-      <div className="text-[11px] font-medium uppercase tracking-[0.14em] text-negotiate">
+      <div className="text-[11px] font-medium uppercase tracking-[0.14em] text-ink-500">
         Require before you start
       </div>
       {conditions.length > 0 ? (

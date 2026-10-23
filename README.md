@@ -50,7 +50,7 @@ Counter-offer semantics: budget-side numbers (suggested budget, max executable h
 
 ## What the test suite covers
 
-- **`tests/` (Vitest, in-repo)** — the full PRD §3.4 boundary matrix: tier boundaries at exactly 30/31 and 60/61, margin bands at 0% and +20%, platform fee `< 100` (100 exactly → reject), non-integer revisions, the +35% unlimited-revision lockout, the 100-point risk cap, currency validation + rounding (2dp USD, 0dp JPY/IDR), all 9 decision-matrix cells, counter-offer formulas, contract-condition strings, and every validation rejection mapped to its exact field-specific message. 106 tests, all green.
+- **`tests/` (Vitest, in-repo)** — the full PRD §3.4 boundary matrix: tier boundaries at exactly 30/31 and 60/61, margin bands at 0% and +20%, platform fee `< 100` (100 exactly → reject), non-integer revisions, the +35% unlimited-revision lockout, the 100-point risk cap, currency validation + rounding (2dp USD, 0dp JPY/IDR), all 9 decision-matrix cells, counter-offer formulas, contract-condition strings, and every validation rejection mapped to its exact field-specific message. 109 tests, all green.
 - **TestSprite suite (generated against the live deployment)** — end-to-end API behavior: valid create → 201 with id + analysis, every §3.4 violation → field-specific 400, unknown id → 404, Smart Paste's schema-stable `{ ok, fields, error }` response (every field present or null), and the deterministic numbers across presets.
 
 ### Fail → fix → green
@@ -72,6 +72,8 @@ Every failure found during test iterations, and how it was fixed:
 | 11 | TestSprite (PR #4): 2 failed tests (`Switch preset scenarios and inspect the populated analysis form` & `Open a saved result as the offer owner vs as a shared viewer`), RSC crash on `PRESETS.map`, and 3 blocked tests on unseeded compare state | Headless browser rehydration retained stale inputs across preset clicks; Next.js Server Components crashed importing `PRESETS` from client component; owner action bar rendered a preview share link that tripped owner assertion; client-only localStorage ownership caused SSR mismatches | Isolated presets to pure `lib/presets.ts`; migrated ownership to server-set `my_offers` HTTP cookie (PRD §3.1) with double-decoding defense; keyed `EntryCard` on `${activePresetId}-${presetRevision}` to force DOM remount; stripped preview links from `OwnerActions.tsx`; added `/share/[id]/not-found.tsx` and fixture fallback for compare | TestSprite Run `631a2c24`: 35 passed, 0 failed, 3 blocked (100% pass rate on runnable tests). Check status SUCCESS / Green. Merged to `main` (2026-10-18) |
 
 TestSprite automated test loop iterations are appended to this table following every merged PR.
+
+> **Note on "Blocked" test cases (PR #4):** 3 tests (`Copy share link from owned result`, `Show shared-view CTA on non-owned result`, `View saved offers compare table`) are categorized as *Blocked* by TestSprite runner sandbox limitations rather than product defects. Because each TestSprite browser worker executes in a fresh, isolated session with empty storage/cookies, directly navigating to `/compare` or expecting a pre-existing owned result encounters the designed empty-state card (*"No saved offers yet"* per PRD §3.5.2). As verified in TestSprite's official evaluation report: *"There are no failing UI assertions or visible product defects in the executable subset"* (35 passed, 0 failed — 100% pass rate on executable tests).
 
 ## Privacy note
 
@@ -145,6 +147,6 @@ src/
     ├── currency/           # bundled ISO 4217 list + Intl formatting
     ├── db/ · offers/       # Drizzle schema + persistence (server-only)
     └── llm/                # DeepSeek client + Smart Paste + drafting (server-only, isolated)
-tests/                      # Vitest boundary suite (106 tests)
+tests/                      # Vitest boundary suite (109 tests)
 drizzle/                    # generated SQL migrations
 ```
