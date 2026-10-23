@@ -48,7 +48,7 @@ export default function OwnerActions({ offerId, isOwner }: OwnerActionsProps) {
     void success;
     if (copyTimeoutRef.current) clearTimeout(copyTimeoutRef.current);
     setCopied(true);
-    copyTimeoutRef.current = setTimeout(() => setCopied(false), 10000);
+    copyTimeoutRef.current = setTimeout(() => setCopied(false), 2500);
   }
 
   const isClientShare =
@@ -74,9 +74,9 @@ export default function OwnerActions({ offerId, isOwner }: OwnerActionsProps) {
           href="/"
           aria-label="Analyze a deal"
           data-testid="analyze-deal-cta"
-          className="mt-3.5 inline-flex items-center gap-2 rounded-xl bg-ink-100 px-5 py-2.5 text-sm font-semibold text-base-950 transition hover:bg-white"
+          className="btn-volta-cta mt-4 inline-flex items-center justify-center gap-2 rounded-full px-5 py-2.5 text-sm font-medium text-white transition active:scale-[0.98]"
         >
-          <Plus className="size-4" />
+          <Plus className="size-4 text-white" />
           <span>Analyze a deal</span>
         </Link>
       </div>
@@ -125,20 +125,6 @@ export default function OwnerActions({ offerId, isOwner }: OwnerActionsProps) {
           New analysis
         </Link>
       </div>
-
-      {copied && (
-        <div className="mt-3 flex items-center gap-2 rounded-xl border border-white/10 bg-white/[0.02] p-1.5">
-          <input
-            type="text"
-            readOnly
-            value={typeof window !== 'undefined' ? `${window.location.origin}/share/${offerId}` : `/share/${offerId}`}
-            data-testid="share-link-input"
-            aria-label="Copied URL"
-            className="min-w-0 flex-1 bg-transparent px-2 text-[11px] text-ink-300 font-mono select-all focus:outline-none"
-            onClick={(e) => (e.target as HTMLInputElement).select()}
-          />
-        </div>
-      )}
     </div>
   );
 }

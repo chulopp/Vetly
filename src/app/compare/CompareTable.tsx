@@ -114,7 +114,7 @@ export function CompareTable({ initialOffers = [] }: { initialOffers?: OfferReco
         <img src="/vetly-icon.png" alt="" className="h-14 w-auto" />
         <h2 className="mt-5 text-lg font-semibold text-ink-100">No saved offers yet</h2>
         <p className="mt-2 text-sm leading-relaxed text-ink-300">
-          Analyze your first project offer and it&apos;ll show up here — ready to compare side
+          Analyze your first project offer and it&apos;ll show up here, ready to compare side
           by side.
         </p>
         <Link
@@ -137,7 +137,7 @@ export function CompareTable({ initialOffers = [] }: { initialOffers?: OfferReco
   return (
     <>
       <div className="glass mt-6 overflow-hidden rounded-2xl">
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
           <table className="w-full min-w-[560px] text-sm">
             <thead>
               <tr className="border-b border-white/10">
