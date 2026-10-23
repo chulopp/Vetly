@@ -1,3 +1,7 @@
+<div align="center">
+
+<img src="public/vetly-full.png" alt="Vetly Logo" width="240" />
+
 # Vetly - Freelance Deal Analyzer
 
 **Know what a project offer is really worth before you say yes.**
@@ -8,6 +12,8 @@
 [![Next.js 15](https://img.shields.io/badge/Next.js_15-black?style=flat&logo=next.js)](https://nextjs.org)
 [![TypeScript](https://img.shields.io/badge/TypeScript-3178c6?style=flat&logo=typescript)](https://www.typescriptlang.org)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+
+</div>
 
 Vetly evaluates freelance project offers (pasted directly from client communication, entered manually, or loaded via 1-click presets) and computes:
 
