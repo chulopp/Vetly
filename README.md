@@ -219,6 +219,34 @@ All error responses strictly return structured JSON payloads with field-specific
 
 ---
 
+## Frequently Asked Questions (FAQ)
+
+### 1. Why does Vetly not require user accounts or login? How does ownership work?
+Vetly eliminates account creation friction so freelancers can evaluate offers immediately. Offer ownership is managed through a server-set HTTP cookie named `my_offers`. When an offer is created, the server appends the offer ID to this cookie. The cookie stores up to 50 offer IDs with a 30-day expiration. When a page loads, the server checks whether the requested offer ID exists in the cookie before rendering owner actions.
+
+### 2. How does link sharing work without exposing private owner controls?
+Every analysis result is stored under a unique identifier (`/result/[id]` or `/share/[id]`). When a recipient opens the link, the server inspects the recipient browser cookie. If the offer ID is not present in their cookie, the server sets `isOwner` to false. The recipient receives the complete analysis in read-only mode. Owner buttons such as Duplicate, Edit, and Save are removed and replaced with a button to analyze a new offer.
+
+### 3. Does an AI model determine the verdict, risk score, or counter-offer?
+No. All calculations are executed by a pure deterministic engine written in TypeScript (`src/lib/engine/`). It contains no machine learning models, database queries, or external network calls. Given identical inputs, it always produces identical numerical outputs. Machine learning is restricted to two boundary tasks: extracting form fields from raw text in Smart Paste, and formatting email text in the reply draft feature.
+
+### 4. Why are business constants like communication overhead (+10%) and revision penalties fixed?
+These values represent documented baseline assumptions defined in PRD Section 3.2. Fixed constants prevent subjective variation and enable reproducible results. This allows automated testing tools such as TestSprite and Vitest to verify exact numeric boundaries rather than approximate ranges.
+
+### 5. How does Vetly handle multiple currencies? Does it convert amounts to USD?
+Vetly retains the native currency of each offer (USD, EUR, GBP, CAD, AUD, JPY, IDR). It does not convert amounts between currencies because foreign exchange rates fluctuate constantly and can distort effective rates. Formatting strictly respects regional currency conventions, such as zero decimal places for JPY and IDR, and two decimal places for USD and EUR.
+
+### 6. How does the live risk gauge update in real time while typing?
+The risk scoring logic in `src/lib/engine/risk.ts` is composed of pure functions without Node.js or browser dependencies. The exact same code executes on the Next.js server and in the client browser. As the user modifies form fields, the client recalculates the score in memory without dispatching network requests.
+
+### 7. What happens if the database or external AI service is unavailable?
+The application isolates system boundaries to prevent total failure. If the DeepSeek API is unreachable or the API key is missing, Smart Paste disables gracefully and the user can enter data manually. If the database is unreachable, core calculations still function in memory, and the system displays a clear notification that persistence is temporarily unavailable.
+
+### 8. Does Smart Paste store or retain raw client messages?
+No. Text submitted to Smart Paste is forwarded to the AI extraction endpoint to return structured JSON. The server does not log, persist, or reuse raw message text. Data is only written to the database when the user explicitly clicks the analyze button.
+
+---
+
 ## Project Structure
 
 ```
