@@ -29,6 +29,18 @@ Every offer can be saved locally on your device without an account, compared sid
 
 ---
 
+## Quick Navigation
+
+| Architecture & Product | Testing & Integrity | Reference & Setup |
+|---|---|---|
+| [Visual Overview](#visual-overview) | [Automated Test Coverage (163 Checks)](#automated-test-coverage) | [Interactive Demo (30s)](#interactive-30-second-demonstration) |
+| [Architecture & Core Principles](#architecture-and-core-principles) | [Fail -> Fix -> Green Loop (PR #5)](#fail--fix--green-engineering-loop) | [API Reference](#api-reference) |
+| [How It Works](#how-it-works) | [Key Engineering Catches](#key-engineering-catches-identified-by-automated-tests) | [Frequently Asked Questions (FAQ)](#frequently-asked-questions-faq) |
+| [Deterministic Constants](#business-constants) | [Complete 12-Iteration Log](#complete-iteration-log) | [Local Development](#local-development) |
+| [Technical Stack](#technical-stack) | [Privacy & Data Handling](#privacy-and-data-handling) | [Project Structure](#project-structure) |
+
+---
+
 ## Visual Overview
 
 ### 1. Offer Intake and Live Risk Scoring (`/`)
